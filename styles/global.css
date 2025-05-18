@@ -1,0 +1,61 @@
+@import url('./!var.css');
+@import url('./ripple.css');
+@import url('./components.css');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto Flex', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background: var(--surface);
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  outline: 0px solid var(--primary);
+}
+
+:is(
+    w-button,
+    w-drop-button,
+    w-input,
+    w-input-pass,
+    w-chip,
+    w-checkbox,
+    w-radio,
+    w-list,
+    w-list-item,
+    w-switch
+  ) {
+  &:focus-visible {
+    animation: focused 0.3s ease-in-out forwards;
+  }
+}
+
+@keyframes focused {
+  25% {
+    outline: 5px solid var(--primary);
+  }
+
+  100% {
+    outline: 2px solid var(--primary);
+  }
+}
+
+iconify-icon {
+  display: inline-block;
+  font-size: 24px;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+body:has(:not(:defined)) {
+  display: none !important;
+}

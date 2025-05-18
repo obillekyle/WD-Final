@@ -1,0 +1,31 @@
+.w-ripple {
+  --color: var(--ripple-color, var(--inverse-surface, #000));
+  --speed: var(--ripple-speed, 0.75s);
+
+  position: absolute;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.075;
+  scale: 0.1;
+  transform-origin: left top;
+  background: var(--color);
+  border-radius: var(--rounded);
+  animation: rippled var(--speed) forwards ease-out;
+
+  &.fade {
+    animation: rippled var(--speed) forwards ease-out, fade var(--speed) forwards ease-out;
+  }
+}
+
+@keyframes fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes rippled {
+  to {
+    scale: 3;
+  }
+}

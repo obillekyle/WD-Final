@@ -1,0 +1,52 @@
+w-app {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  height: 100dvh;
+
+  position: relative;
+  overflow: hidden;
+  contain: content;
+}
+
+w-breakpoint {
+  display: flex;
+  flex-direction: column;
+  gap: var(--component-sm);
+
+  padding: var(--component-xl) var(--lg);
+  width: min(100%, var(--breakpoint-desktop-xl));
+  margin-inline: auto;
+}
+
+w-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+
+  position: relative;
+  overflow: auto;
+  contain: content;
+}
+
+w-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sm);
+
+  position: relative;
+  overflow: hidden;
+  contain: content;
+
+  padding: var(--lg);
+  background: var(--pure);
+  border-radius: var(--sm);
+
+  box-shadow: 0 0 0 1px inset var(--outline);
+}
+
+w-header {
+  font-family: 'Noto Serif', serif;
+  font-size: var(--component-xs);
+  color: var(--primary);
+  font-weight: 700;
+}

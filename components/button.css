@@ -1,0 +1,104 @@
+w-button,
+w-drop-button {
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  width: max-content;
+  user-select: none;
+  padding: 0;
+
+  position: relative;
+  contain: content;
+  overflow: hidden;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: var(--component-sm);
+  border-radius: var(--rounded);
+
+  color: var(--pure);
+  font-size: var(--font-sm);
+  font-weight: 600;
+
+  transition: all 0.2s var(--timing-standard);
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+w-button {
+  gap: var(--sm);
+
+  height: var(--component-sm);
+  padding-inline: var(--md);
+
+  background: var(--primary);
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Variants */
+
+  &[variant='outlined'] {
+    background: var(--surface);
+    box-shadow: 0 0 0 1px inset var(--primary);
+    color: var(--primary);
+  }
+
+  &[variant='text'] {
+    background: none;
+    color: var(--primary);
+    padding-inline: var(--sm);
+  }
+}
+
+w-drop-button {
+  gap: calc(var(--xxs) / 2);
+
+  > div,
+  > iconify-icon {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  > div {
+    gap: var(--sm);
+    justify-content: center;
+
+    padding-inline: var(--md);
+    border-radius: var(--component-sm) var(--xs) var(--xs) var(--component-sm);
+
+    background: var(--primary);
+  }
+
+  > iconify-icon {
+    aspect-ratio: 1;
+    padding-inline: var(--xxs) var(--xs);
+
+    background: var(--primary);
+    border-radius: var(--xs) var(--component-sm) var(--component-sm) var(--xs);
+  }
+
+  &[variant='outlined'] {
+    > div,
+    > iconify-icon {
+      background: var(--surface);
+      box-shadow: 0 0 0 1px inset var(--primary);
+      color: var(--primary);
+    }
+  }
+}

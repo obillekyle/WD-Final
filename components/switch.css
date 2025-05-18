@@ -1,0 +1,120 @@
+w-switch {
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+
+  width: var(--component-lg);
+  height: var(--component-xs);
+  border-radius: var(--rounded);
+
+  color: var(--outline-variant);
+
+  box-shadow: 0 0 0 2px inset currentColor;
+  transition: all 0.2s var(--timing-standard);
+
+  [thumb] {
+    position: absolute;
+    aspect-ratio: 1;
+    height: 100%;
+    scale: 0.5;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: var(--rounded);
+
+    left: 0;
+    translate: 0 0;
+
+    transition: all 0.2s var(--timing-standard);
+
+    iconify-icon {
+      position: absolute;
+      pointer-events: none;
+      color: var(--pure);
+
+      transition: inherit;
+      opacity: 0;
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      pointer-events: none;
+      inset: 0;
+      border-radius: inherit;
+
+      transition: inherit;
+    }
+
+    &::after {
+      background: var(--outline-variant);
+      z-index: -1;
+    }
+
+    &::before {
+      background: var(--outline-variant);
+      opacity: 0;
+      scale: 2.6;
+      z-index: -1;
+
+      transition: inherit;
+    }
+  }
+
+  &:focus-within [thumb]::before {
+    opacity: 0.2;
+  }
+
+  input {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  &:has(input:checked) {
+    box-shadow: 0 0 0 2px inset var(--primary);
+    background-color: var(--primary);
+
+    [thumb] {
+      left: calc(100% - var(--component-xs));
+      scale: 0.75;
+
+      iconify-icon {
+        scale: 1.25;
+        color: var(--primary);
+      }
+
+      &::after {
+        background: var(--pure);
+      }
+
+      &::before {
+        scale: 1.75;
+      }
+    }
+
+    [checked] {
+      opacity: 1;
+    }
+
+    [unchecked] {
+      opacity: 0;
+    }
+  }
+
+  &[variant='big-thumb'] {
+    [thumb] {
+      scale: 0.75;
+
+      &::before {
+        scale: 1.75;
+      }
+    }
+
+    [unchecked] {
+      opacity: 1;
+    }
+  }
+}
