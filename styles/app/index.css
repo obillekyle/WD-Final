@@ -1,4 +1,5 @@
 @import url('./dashboard.css');
+@import url('./schedule.css');
 
 .login-sidebar {
   display: flex;
@@ -66,4 +67,10 @@
 
 #nav-logo {
   width: var(--size-lg);
+}
+
+@media (width <= 768px) {
+  .login-sidebar {
+    display: none;
+  }
 }

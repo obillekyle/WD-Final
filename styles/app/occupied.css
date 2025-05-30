@@ -1,0 +1,33 @@
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--xs);
+
+  position: relative;
+
+  &:empty:after {
+    content: 'There are no occupied rooms this time of day.';
+    position: absolute;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .room {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: var(--xxs);
+    aspect-ratio: 1;
+
+    position: relative;
+    overflow: hidden;
+
+    text-align: center;
+    text-wrap: balance;
+
+    box-shadow: 0 0 0 1px inset var(--outline);
+    border-radius: var(--xs);
+  }
+}

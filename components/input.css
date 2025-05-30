@@ -46,7 +46,7 @@ w-input-pass {
     width: 100%;
   }
 
-  .w-input-label {
+  [label] {
     display: flex;
     align-items: center;
 
@@ -61,8 +61,9 @@ w-input-pass {
   /* Moves the label to the top */
   &:active,
   &:has(input:focus),
-  &:has(input:not(:placeholder-shown)) {
-    .w-input-label {
+  &:has(input:not(:placeholder-shown)),
+  &[forced-label] {
+    [label] {
       top: -10%;
       left: calc(var(--xxs) / 2 * -1);
       transform: translateY(0);
@@ -75,10 +76,11 @@ w-input-pass {
   }
 
   &:active,
-  &:has(:focus) {
+  &:has(:focus),
+  &[forced-label] {
     box-shadow: 0 0 0 2px inset var(--primary);
 
-    .w-input-label {
+    [label] {
       color: var(--primary);
     }
   }
@@ -88,13 +90,13 @@ w-input-pass {
    * unless the input is focused or the current element was active
    * i'm sorry for this abomination of a selector
    */
-  &:has(input:placeholder-shown:not(:focus)):not(:active) {
-    & > div > :not(.w-input-label) {
+  &:has(input:placeholder-shown:not(:focus)):not(:active):not([forced-label]) {
+    & > div > :not([label]) {
       opacity: 0;
     }
   }
 
-  &:has(input:required) .w-input-label::after {
+  &:has(input:required) [label]::after {
     content: '*';
     color: var(--error);
   }
@@ -111,4 +113,15 @@ w-input-pass {
   [eye] {
     cursor: pointer;
   }
+}
+
+w-input-divider {
+  font-size: var(--font-sm);
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-transform: uppercase;
+  gap: var(--xxs);
 }

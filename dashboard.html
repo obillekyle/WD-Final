@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link rel="stylesheet" href="./styles/index.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+    <script src="./script/index.js" type="module"></script>
+
+    <script src="./script/page/dashboard.js" type="module"></script>
+  </head>
+
+  <body>
+    <w-app>
+      <w-navigation>
+        <img src="../assets/logo.webp" alt="Logo" id="nav-logo" />
+        <w-navigation-list>
+          <w-navigation-item
+            icon="material-symbols:home-outline"
+            href="./dashboard.html"
+            match="\/dashboard"
+          >
+            Home
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="mdi:teach"
+            href="./faculty.html"
+            match="\/faculty"
+          >
+            Faculty
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:book-ribbon-outline"
+            href="./subject.html"
+            match="\/subject"
+          >
+            Subjects
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:group-outline"
+            href="./section.html"
+            match="\/section"
+          >
+            Sections
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:meeting-room-outline"
+            href="./room.html"
+            match="\/room"
+          >
+            Rooms
+          </w-navigation-item>
+          <w-navigation-item
+            mobile
+            icon="material-symbols:id-card-outline"
+            href="./data.html"
+            match="\/data"
+          >
+            Data
+          </w-navigation-item>
+          <w-navigation-item
+            icon="material-symbols:calendar-month-outline"
+            href="./schedule.html"
+            match="\/schedule"
+          >
+            Schedule
+          </w-navigation-item>
+        </w-navigation-list>
+
+        <div class="account"> </div>
+      </w-navigation>
+      <w-content dashboard>
+        <div id="background"></div>
+
+        <w-breakpoint>
+          <div class="flex-col gap-xxs">
+            <span>Welcome Back</span>
+            <w-header>MIS</w-header>
+          </div>
+
+          <div class="flex-col gap-md">
+            <div class="useful-cards">
+              <w-card>
+                <span class="title">Total Faculty Members</span>
+                <span class="value" id="total-faculty">100</span>
+                <iconify-icon accent icon="mdi:teach"></iconify-icon>
+              </w-card>
+              <w-card>
+                <span class="title">Total Rooms</span>
+                <span class="value" id="total-rooms">100</span>
+                <iconify-icon
+                  accent
+                  icon="material-symbols:meeting-room-outline"
+                ></iconify-icon>
+              </w-card>
+              <w-card>
+                <span class="title">Total Subjects</span>
+                <span class="value" id="total-subjects">100</span>
+                <iconify-icon
+                  accent
+                  icon="material-symbols:book-ribbon-outline"
+                ></iconify-icon>
+              </w-card>
+              <w-card>
+                <span class="title">Total Student Sections</span>
+                <span class="value" id="total-sections">100</span>
+                <iconify-icon
+                  accent
+                  icon="material-symbols:group-outline"
+                ></iconify-icon>
+              </w-card>
+            </div>
+
+            <div class="other-cards">
+              <div class="card-column">
+                <w-card class="w-fill">
+                  <span class="title">Class Schedules</span>
+                  <span class="text-sub">
+                    <span id="total-classes">12</span>
+                    <span>classes currently scheduled</span>
+                  </span>
+                  <div class="flex-col gap-xs" id="class-schedules"> </div>
+
+                  <a
+                    href="./occupied.html"
+                    class="card-button ripple flex gap-auto text-primary"
+                    style="margin-top: auto"
+                  >
+                    <span>View more...</span>
+                    <iconify-icon icon="mdi:chevron-right"></iconify-icon>
+                  </a>
+                </w-card>
+                <w-card>
+                  <span class="title">Calendar</span>
+                  <w-calendar></w-calendar>
+                  <div class="divider"></div>
+
+                  <a href="./schedule.html" class="card-button ripple">
+                    <iconify-icon
+                      icon="material-symbols:calendar-month-outline"
+                    ></iconify-icon>
+                    <span>View Schedule</span>
+                  </a>
+                </w-card>
+              </div>
+
+              <div class="card-column">
+                <w-card>
+                  <span class="title">Classroom Utilization</span>
+                  <w-progress value="50"></w-progress>
+                  <span class="text-sub">
+                    50% of rooms are currently in use
+                  </span>
+                  <div class="divider"></div>
+                  <a href="./rooms.html" class="card-button ripple">
+                    <iconify-icon
+                      icon="material-symbols:meeting-room-outline"
+                    ></iconify-icon>
+                    <span>Rooms Overview</span>
+                  </a>
+                </w-card>
+
+                <w-card>
+                  <span class="title">Faculty Teaching Load</span>
+                  <span class="teaching-load">
+                    <iconify-icon icon="mdi:teach-poll"></iconify-icon>
+                    <span class="flex-col">
+                      <span class="value">4</span>
+                      <span class="text-sub">
+                        Average classes per faculty member
+                      </span>
+                    </span>
+                  </span>
+                </w-card>
+
+                <w-card class="w-fill">
+                  <span class="title">
+                    <span>Occupied Rooms</span>
+                    <iconify-icon
+                      icon="material-symbols:chevron-right"
+                    ></iconify-icon>
+                  </span>
+                  <div class="room-grid" id="occupied-rooms"> </div>
+                </w-card>
+              </div>
+
+              <div class="card-column">
+                <w-card>
+                  <span class="title">Actions</span>
+                  <div class="actions">
+                    <a href="./data.html" class="action ripple">
+                      <iconify-icon
+                        icon="material-symbols:database-outline"
+                      ></iconify-icon>
+                      <span>Manage Data</span>
+                    </a>
+                    <a href="./schedule.html" class="action ripple">
+                      <iconify-icon
+                        icon="material-symbols:calendar-clock-outline"
+                      ></iconify-icon>
+                      <span>View Schedules</span>
+                    </a>
+                    <div class="action ripple">
+                      <iconify-icon
+                        icon="material-symbols:lock-open-outline"
+                      ></iconify-icon>
+                      <span>Access Logs</span>
+                    </div>
+                    <div class="action ripple">
+                      <iconify-icon
+                        icon="mdi:account-cog-outline"
+                      ></iconify-icon>
+                      <span>Manage Accounts</span>
+                    </div>
+                  </div>
+                </w-card>
+
+                <w-card class="w-fill">
+                  <span class="title">Important Actions</span>
+                  <span class="text-sub">
+                    There are no current events in need of your attention
+                  </span>
+                </w-card>
+
+                <w-card>
+                  <span class="title">
+                    <span>Recent Activities</span>
+                    <iconify-icon
+                      icon="material-symbols:chevron-right"
+                    ></iconify-icon>
+                  </span>
+                  <div class="schedule">
+                    <iconify-icon
+                      icon="material-symbols:edit-calendar-outline"
+                    ></iconify-icon>
+                    <div info>
+                      <span>The schedule for room 404 is updated</span>
+                      <span class="text-sub">
+                        Today at 11:00AM &bullet; VPAA
+                      </span>
+                    </div>
+                  </div>
+                  <span class="schedule">
+                    <iconify-icon
+                      icon="material-symbols:edit-calendar-outline"
+                    ></iconify-icon>
+                    <div info>
+                      <span>The schedule for room A-102 is updated</span>
+                      <span class="text-sub">
+                        Today at 11:00AM &bullet; VPAA
+                      </span>
+                    </div>
+                  </span>
+                </w-card>
+              </div>
+            </div>
+          </div>
+        </w-breakpoint>
+      </w-content>
+    </w-app>
+  </body>
+</html>

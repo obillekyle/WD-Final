@@ -42,6 +42,7 @@ export function getInputAttributes(element) {
     step: element.getAttribute('step'),
     required: element.getAttribute('required'),
     disabled: element.getAttribute('disabled'),
+    list: element.getAttribute('list'),
   };
 }
 

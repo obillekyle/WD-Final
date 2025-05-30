@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link rel="stylesheet" href="./styles/index.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+    <script src="./script/index.js" type="module"></script>
+
+    <script src="./script/page/account-setup.js" type="module"></script>
+  </head>
+
+  <body>
+    <w-app>
+      <w-navigation>
+        <img src="./assets/logo.webp" alt="Logo" id="nav-logo" />
+        <w-navigation-list>
+          <w-navigation-item
+            icon="material-symbols:home-outline"
+            href="./dashboard.html"
+            match="\/dashboard"
+          >
+            Home
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="mdi:teach"
+            href="./faculty.html"
+            match="\/faculty"
+          >
+            Faculty
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:book-ribbon-outline"
+            href="./subject.html"
+            match="\/subject"
+          >
+            Subjects
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:group-outline"
+            href="./section.html"
+            match="\/section"
+          >
+            Sections
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:meeting-room-outline"
+            href="./room.html"
+            match="\/room"
+          >
+            Rooms
+          </w-navigation-item>
+          <w-navigation-item
+            mobile
+            icon="material-symbols:id-card-outline"
+            href="./data.html"
+            match="\/data"
+          >
+            Data
+          </w-navigation-item>
+          <w-navigation-item
+            icon="material-symbols:calendar-month-outline"
+            href="./schedule.html"
+            match="\/schedule"
+          >
+            Schedule
+          </w-navigation-item>
+        </w-navigation-list>
+
+        <div class="account"> </div>
+      </w-navigation>
+      <w-content>
+        <w-breakpoint>
+          <div class="flex gap-auto">
+            <w-header> Data Management </w-header>
+          </div>
+
+          <w-list>
+            <w-list-item href="./faculty.html">
+              <iconify-icon icon="mdi:teach"></iconify-icon>
+              <span>Faculty</span>
+            </w-list-item>
+            <w-list-item href="./subject.html">
+              <iconify-icon
+                icon="material-symbols:book-ribbon-outline"
+              ></iconify-icon>
+              <span>Subjects</span>
+            </w-list-item>
+            <w-list-item href="./section.html">
+              <iconify-icon
+                icon="material-symbols:group-outline"
+              ></iconify-icon>
+              <span>Sections</span>
+            </w-list-item>
+            <w-list-item href="./room.html">
+              <iconify-icon
+                icon="material-symbols:meeting-room-outline"
+              ></iconify-icon>
+              <span>Rooms</span>
+            </w-list-item>
+            <w-list-item href="./schedule.html">
+              <iconify-icon
+                icon="material-symbols:calendar-month-outline"
+              ></iconify-icon>
+              <span>Schedule</span>
+            </w-list-item>
+          </w-list>
+        </w-breakpoint>
+      </w-content>
+    </w-app>
+  </body>
+</html>

@@ -3,8 +3,13 @@
 @import url('./calendar.css');
 @import url('./checkbox.css');
 @import url('./chip.css');
+@import url('./dialog.css');
 @import url('./input.css');
 @import url('./list.css');
 @import url('./navigation.css');
 @import url('./progress.css');
+@import url('./select.css');
+@import url('./spinner.css');
 @import url('./switch.css');
+@import url('./table.css');
+@import url('./time.css');

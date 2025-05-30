@@ -44,7 +44,7 @@ export function aQ$(selector, root = document) {
  * @returns {HTMLTemplateElement | undefined}
  */
 export function getTemplate(id) {
-  return /** @type {any} */ (q$('template#' + id)) ?? undefined;
+  return /** @type {any} */ (q$(`template#${id}`)) ?? undefined;
 }
 
 /**
@@ -126,12 +126,13 @@ export function rand(min, max, seed = '') {
  * @typedef {Object} Position
  * @prop {number} x
  * @prop {number} y
- *
+ * @param {Event} event
  */
-
 export function isInteractiveEvent(event) {
   return (
-    event instanceof MouseEvent || event instanceof TouchEvent || event instanceof PointerEvent
+    event instanceof MouseEvent ||
+    event instanceof TouchEvent ||
+    event instanceof PointerEvent
   );
 }
 
@@ -164,29 +165,74 @@ export function getClientPos(event) {
  * @returns
  */
 export function newElement(tagName, attributes = {}) {
-  const element = document.createElement(tagName);
+  let element;
+
+  switch (tagName) {
+    case 'svg':
+    case 'circle':
+    case 'path':
+    case 'g':
+    case 'rect':
+    case 'text':
+    case 'line':
+    case 'polygon':
+    case 'polyline':
+    case 'use':
+    case 'defs':
+    case 'clipPath':
+    case 'linearGradient':
+    case 'radialGradient':
+    case 'stop':
+    case 'image':
+    case 'tspan':
+    case 'foreignObject':
+    case 'desc':
+    case 'title':
+    case 'animate':
+    case 'animateMotion':
+    case 'animateTransform':
+    case 'set':
+    case 'animateColor':
+      element = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+      break;
+
+    default:
+      element = document.createElement(tagName);
+      break;
+  }
+
   bindAttrs(element, attributes);
   return element;
 }
 
 /**
  * Binds attributes to an element
- * @template {HTMLElement} E
+ * @template {HTMLElement | SVGElement} E
  * @param {E} element
  * @param {Record<string, any> | string[]} attributes
  * @returns {E}
  */
 
 export function bindAttrs(element, attributes) {
-  attributes = Array.isArray(attributes)
-    ? Object.fromEntries(attributes.map((attr) => [attr, '']))
+  const attrArray = Array.isArray(attributes)
+    ? Object.fromEntries(
+        attributes.map((/** @type {any} */ attr) => [attr, ''])
+      )
     : attributes;
 
-  for (const [key, value] of Object.entries(attributes)) {
-    if (value === undefined || value === null) continue;
+  for (const [key, value] of Object.entries(attrArray)) {
+    if (value === undefined || value === null || value === false) {
+      element.removeAttribute(key);
+      continue;
+    }
 
-    if (key.startsWith('on')) {
+    if (key.startsWith('on') && typeof value === 'function') {
       element.addEventListener(key.slice(2).toLowerCase(), value);
+      continue;
+    }
+
+    if (value === true) {
+      element.setAttribute(key, '');
       continue;
     }
 
@@ -204,9 +250,24 @@ export function bindAttrs(element, attributes) {
         continue;
       }
 
+      case 'text': {
+        element.textContent = String(value);
+        continue;
+      }
+
+      case 'html': {
+        element.innerHTML = String(value);
+        continue;
+      }
+
       case 'style': {
         if (typeof value === 'object') {
-          Object.assign(element.style, value);
+          const cssArray = [];
+          for (const [prop, val] of Object.entries(value)) {
+            cssArray.push(`${prop}: ${val}`);
+          }
+
+          element.style.cssText = cssArray.join('; ');
           continue;
         }
 
@@ -215,12 +276,14 @@ export function bindAttrs(element, attributes) {
       }
 
       case 'dataset': {
-        Object.assign(element.dataset, String(value));
+        if (typeof value !== 'object') continue;
+        Object.assign(element.dataset, value);
         continue;
       }
 
       case 'class':
       case 'className': {
+        if (element instanceof SVGElement) continue;
         element.className = String(value);
         continue;
       }
@@ -237,12 +300,12 @@ export function bindAttrs(element, attributes) {
  * @param {string | any[]} array
  */
 export function getRandomItemsFromArray(itemCount, array) {
-  itemCount = itemCount > array.length ? array.length : itemCount;
+  const count = itemCount > array.length ? array.length : itemCount;
 
   const copiedArray = [...array];
   const newArray = [];
 
-  for (let i = 0; i < itemCount; i++) {
+  for (let i = 0; i < count; i++) {
     const index = rand(0, copiedArray.length - 1);
     newArray.push(copiedArray[index]);
     copiedArray.splice(index, 1);
@@ -270,4 +333,167 @@ export function getParent(element, selector) {
     parent = parent.parentElement;
   }
   return null;
+}
+
+/**
+ * @param {string} str
+ */
+export function getUppercaseLetters(str) {
+  const matches = str.match(/[A-Z0-9]/g);
+  return matches ? matches.join('') : '';
+}
+
+/**
+ * @template {Element} T
+ * @param {Element} element
+ * @param {T} newElement
+ */
+export function replaceElement(element, newElement) {
+  const parent = element.parentElement;
+  parent?.replaceChild(newElement, element);
+  return newElement;
+}
+
+/**
+ * @param {any[]} arr
+ * @param {string} separator
+ */
+export function filteredJoin(arr, separator) {
+  return arr.filter(Boolean).join(separator);
+}
+
+export function getBrowserAndOS() {
+  const ua = navigator.userAgent;
+  let browser = 'Unknown';
+  let os = 'Unknown';
+
+  if (/Edg\//.test(ua)) browser = 'Microsoft Edge';
+  else if (/OPR\//.test(ua)) browser = 'Opera';
+  else if (/Chrome\//.test(ua)) browser = 'Chrome';
+  else if (/Firefox\//.test(ua)) browser = 'Firefox';
+  else if (/Safari\//.test(ua)) browser = 'Safari';
+
+  if (/Windows NT/.test(ua)) os = 'Windows';
+  else if (/Mac OS X/.test(ua)) os = 'macOS';
+  else if (/Android/.test(ua)) os = 'Android';
+  else if (/iPhone|iPad|iPod/.test(ua)) os = 'iOS';
+  else if (/Linux/.test(ua)) os = 'Linux';
+
+  return `${browser} on ${os}`;
+}
+
+/**
+ * @param {string} key
+ * @param {any} value
+ */
+export function expose(key, value) {
+  // @ts-ignore
+  window.app ||= {};
+  // @ts-ignore
+  window.app[key] = value;
+}
+
+/**
+ * @param {HTMLElement} el
+ * @param {number} count
+ * @param {number} [duration]
+ */
+export function animateCounter(el, count, duration = 1000) {
+  const start = performance.now();
+  const from = 0;
+  const to = count;
+
+  /**
+   * @param {number} now
+   */
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const value = Math.floor(from + (to - from) * progress);
+    el.textContent = value.toString();
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// A function that resizes the picture to 256px by 256px
+// and then converts it to a webp file
+
+/**
+ *
+ * @param {File | Blob} file
+ * @returns
+ */
+export async function prepareImage(file) {
+  if (!file || !file.type.match(/^image\//)) return '';
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) return '';
+
+  const img = await createImageBitmap(file);
+  ctx.drawImage(img, 0, 0, 256, 256);
+  return canvas.toDataURL('image/webp');
+}
+/**
+ * @overload
+ * @param {string} type
+ * @param {false} multiple
+ * @returns {Promise<File | null>}
+ */
+/**
+ * @overload
+ * @param {string} type
+ * @returns {Promise<File | null>}
+ */
+/**
+ * @overload
+ * @param {string} type
+ * @param {true} multiple
+ * @returns {Promise<File[]>}
+ */
+/**
+ * @param {string} type
+ * @param {boolean} [multiple]
+ * @returns {Promise<File[] | File | null>}
+ */
+export async function openFilePicker(type, multiple = false) {
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = type;
+    input.multiple = multiple;
+    input.onchange = () => {
+      const files = input.files || [];
+      resolve(multiple ? Array.from(files) : files[0]);
+    };
+    input.click();
+  });
+}
+
+const timeouts = new Map();
+/**
+ * @param {() => void} callback
+ * @param {number | undefined} delay
+ */
+export function debounce(callback, delay) {
+  timeouts.has(callback) ? clearTimeout(timeouts.get(callback)) : callback();
+  timeouts.set(
+    callback,
+    setTimeout(() => {
+      callback();
+      timeouts.delete(callback);
+    }, delay)
+  );
+}
+
+/** @type {(value: any, message?: string) => asserts value} */
+export function assert(value, message = 'Assertion failed') {
+  if (!value) throw new Error(message);
 }

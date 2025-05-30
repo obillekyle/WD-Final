@@ -1,77 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="./styles/index.css">
+    <link rel="stylesheet" href="./styles/index.css" />
 
-  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
-  <script src="./script/index.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+    <script src="./script/index.js" type="module"></script>
+    <script src="./script/page/login.js" type="module"></script>
+  </head>
 
-</head>
+  <body>
+    <w-app>
+      <div class="login-sidebar">
+        <img src="./assets/logo.webp" alt="Logo" width="144px" />
+        <w-header>Bulacan Polytechnic College</w-header>
+        <em>Your Partner to Reach the World</em>
 
-<body>
-  <w-app>
-    <w-navigation>
-
-      <w-navigation-list>
-        <w-navigation-item icon="material-symbols:10k">Item 1</w-navigation-item>
-        <w-navigation-item icon="material-symbols:10k">Item 2</w-navigation-item>
-        <w-navigation-item icon="material-symbols:10k">Item 3</w-navigation-item>
-      </w-navigation-list>
-
-    </w-navigation>
-
-    <w-content>
-      <div class="components">
-        <w-button icon="material-symbols:10k">Button</w-button>
-        <w-button icon="material-symbols:10k" variant="outlined">Button</w-button>
-
-        <w-drop-button icon="material-symbols:10k">Dropdown</w-drop-button>
-        <w-drop-button icon="material-symbols:10k" variant="outlined">Dropdown</w-drop-button>
-
-        <w-button disabled icon="material-symbols:10k">Button</w-button>
-        <w-button disabled icon="material-symbols:10k" variant="outlined">Button</w-button>
-
-        <w-drop-button disabled icon="material-symbols:10k">Dropdown</w-drop-button>
-        <w-drop-button disabled icon="material-symbols:10k" variant="outlined">Dropdown</w-drop-button>
-
-
-        <w-input icon="material-symbols:10k" placeholder="Placeholder">
-          Password
-        </w-input>
-
-        <w-input-pass icon="material-symbols:10k" required>
-          Password
-        </w-input-pass>
-
-        <w-checkbox>
-          Checkbox
-        </w-checkbox>
-
-        <w-radio value="1" name="radio">Radio 1</w-radio>
-        <w-radio value="2" name="radio">Radio 2</w-radio>
-        <w-radio value="3" name="radio" checked>Radio 3</w-radio>
-
-        <w-list>
-          <w-list-item>Item 1</w-list-item>
-          <w-list-item>Item 2</w-list-item>
-          <w-list-item>Item 3</w-list-item>
-        </w-list>
-
-        <w-switch icon-active="material-symbols:check-small" icon-inactive="material-symbols:close-small"></w-switch>
-        <w-switch icon-active="material-symbols:check-small" icon-inactive="material-symbols:close-small"
-          variant="big-thumb"></w-switch>
-
-        <w-chip icon="material-symbols:10k">Chip</w-chip>
-        <w-chip icon="material-symbols:10k" variant="outlined">Chip</w-chip>
+        <div class="login-switcher">
+          <b>Login as:</b>
+        </div>
       </div>
-    </w-content>
 
+      <w-content>
+        <form id="login-form" method="post" onsubmit="app.onSubmit(event)">
+          <w-header>MIS Login</w-header>
+          <span>Login with your mis credentials.</span>
 
-  </w-app>
-</body>
+          <w-input
+            name="login"
+            icon="material-symbols:person-outline"
+            required
+            id="username"
+          >
+            Username
+          </w-input>
+          <w-input-pass icon="material-symbols:password" required id="password">
+            Password
+          </w-input-pass>
+          <w-checkbox name="remember"> Remember me </w-checkbox>
 
+          <div class="flex-col gap-xs">
+            <w-button type="submit" icon="material-symbols:login"
+              >Login</w-button
+            >
+            <w-button
+              variant="outlined"
+              icon="mdi:user-key-outline"
+              onclick="usePasskey()"
+              >Use a Passkey</w-button
+            >
+          </div>
+        </form>
+      </w-content>
+    </w-app>
+  </body>
 </html>

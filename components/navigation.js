@@ -2,17 +2,9 @@ import { ripple } from '../script/events/ripple.js';
 import { newElement } from '../script/utils.js';
 import { clickWithSpaceAndEnter, createIcon, takeAttribute } from './!util.js';
 
-export class WNavigation extends HTMLElement {
-  constructor() {
-    super();
-  }
-}
+export class WNavigation extends HTMLElement {}
 
 export class WNavigationItem extends HTMLElement {
-  constructor() {
-    super();
-  }
-
   get href() {
     return this.getAttribute('href');
   }
@@ -42,8 +34,10 @@ export class WNavigationItem extends HTMLElement {
     this.append(icon, text);
 
     this.addEventListener('pointerdown', ripple);
-    this.click = () => (window.location.href = this.href || '#');
     this.addEventListener('keyup', clickWithSpaceAndEnter.bind(this));
+    this.addEventListener('click', () => {
+      window.location.href = this.href || '#';
+    });
 
     this.bindActive();
     window.addEventListener('locationchange', this.bindActive.bind(this));
@@ -54,16 +48,14 @@ export class WNavigationItem extends HTMLElement {
   }
 
   set disabled(value) {
-    value ? this.setAttribute('disabled', '') : this.removeAttribute('disabled');
+    value
+      ? this.setAttribute('disabled', '')
+      : this.removeAttribute('disabled');
     this.tabIndex = value ? -1 : 0;
   }
 }
 
-export class WNavigationList extends HTMLElement {
-  constructor() {
-    super();
-  }
-}
+export class WNavigationList extends HTMLElement {}
 
 customElements.define('w-navigation', WNavigation);
 customElements.define('w-navigation-item', WNavigationItem);

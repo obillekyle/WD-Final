@@ -1,0 +1,112 @@
+w-table {
+  position: relative;
+
+  [table] {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    scrollbar-width: none;
+  }
+
+  [header] {
+    display: flex;
+    flex-direction: row;
+    gap: var(--md);
+    align-items: center;
+    border-bottom: 1px solid var(--outline-variant);
+    height: var(--component-md);
+    padding-inline: var(--md);
+    flex: 0 0 auto;
+    min-width: max-content;
+
+    > *:not(w-checkbox) {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    > div:first-of-type {
+      min-width: min(50dvw, 400px);
+      justify-content: start;
+    }
+    > div {
+      display: flex;
+      align-items: center;
+      user-select: none;
+      cursor: pointer;
+      justify-content: center;
+      text-align: center;
+
+      iconify-icon {
+        display: none;
+      }
+
+      [shown] {
+        display: block;
+
+        &[asc] {
+          transform: scale(-1);
+        }
+      }
+    }
+  }
+
+  w-checkbox {
+    position: sticky;
+    background: var(--pure);
+    left: 1px;
+    z-index: 1;
+  }
+
+  [body] {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(var(--component-lg) * var(--table-rows, 10));
+    border-bottom: 1px solid var(--outline-variant);
+    flex: 0 0 auto;
+    min-width: max-content;
+
+    &:empty:after {
+      content: 'There are no records to show.';
+      position: absolute;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      text-wrap: balance;
+      inset: 0;
+      opacity: 0.5;
+    }
+  }
+
+  [row] {
+    display: flex;
+    flex-direction: row;
+    gap: var(--md);
+    align-items: center;
+    border-bottom: 1px solid var(--outline);
+    height: var(--component-lg);
+    padding-inline: var(--md);
+
+    > *:not(w-checkbox) {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    > div:first-of-type {
+      min-width: min(50dvw, 400px);
+      text-align: start;
+    }
+
+    > div {
+      text-align: center;
+    }
+  }
+
+  [pagination] {
+    display: flex;
+    flex-direction: row;
+    gap: var(--md);
+    align-items: center;
+    justify-content: center;
+    padding-block: var(--md);
+  }
+}

@@ -1,18 +1,15 @@
 import { ripple } from '../script/events/ripple.js';
 
-export class WList extends HTMLElement {
-  constructor() {
-    super();
-  }
-}
+export class WList extends HTMLElement {}
 
 export class WListItem extends HTMLElement {
-  constructor() {
-    super();
-  }
-
   connectedCallback() {
     this.addEventListener('pointerdown', ripple);
+
+    this.addEventListener('click', (event) => {
+      if (this.hasAttribute('href') && !this.hasAttribute('disabled'))
+        window.location.href = this.getAttribute('href') || '#';
+    });
   }
 }
 

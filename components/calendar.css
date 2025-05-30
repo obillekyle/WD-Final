@@ -4,8 +4,6 @@ w-calendar {
   gap: var(--sm);
 
   position: relative;
-  overflow: hidden;
-
   [header] {
     display: flex;
     justify-content: space-between;

@@ -1,23 +1,31 @@
 import { ripple } from '../script/events/ripple.js';
 import { newElement } from '../script/utils.js';
-import { takeAttribute, createIcon, getInputAttributes, clickWithSpaceAndEnter } from './!util.js';
+import {
+  takeAttribute,
+  createIcon,
+  getInputAttributes,
+  clickWithSpaceAndEnter,
+} from './!util.js';
 
 export class WCheckbox extends HTMLElement {
   input;
 
-  constructor() {
-    super();
-  }
-
   connectedCallback() {
     const innerHTML = this.innerHTML;
 
+    const indeterminate = this.hasAttribute('indeterminate');
     const label = takeAttribute(this, 'label') || innerHTML;
     const content = label ? newElement('div', { innerHTML: label }) : '';
     const indicator = newElement('div', { indicator: '' });
 
-    const iconActive = createIcon('mdi:checkbox-marked', ['checked', 'noobserver']);
-    const iconInactive = createIcon('mdi:checkbox-blank-outline', ['unchecked', 'noobserver']);
+    const iconActive = createIcon(
+      indeterminate ? 'mdi:minus-box' : 'mdi:checkbox-marked',
+      ['checked', 'noobserver']
+    );
+    const iconInactive = createIcon('mdi:checkbox-blank-outline', [
+      'unchecked',
+      'noobserver',
+    ]);
 
     this.input = newElement('input', {
       ...getInputAttributes(this),
@@ -30,16 +38,22 @@ export class WCheckbox extends HTMLElement {
     this.append(this.input, indicator, content);
     this.addEventListener('click', () => this.input.click());
     this.addEventListener('pointerdown', (event) => ripple(event, indicator));
-    this.input.addEventListener('keyup', (event) => clickWithSpaceAndEnter(event, indicator));
+    this.input.addEventListener('keyup', (event) =>
+      clickWithSpaceAndEnter(event, indicator)
+    );
+  }
+
+  get checked() {
+    return this.input.checked;
+  }
+
+  set checked(value) {
+    this.input.checked = value;
   }
 }
 
 export class WRadio extends HTMLElement {
   input;
-
-  constructor() {
-    super();
-  }
 
   connectedCallback() {
     const innerHTML = this.innerHTML;
@@ -48,10 +62,19 @@ export class WRadio extends HTMLElement {
     const content = label ? newElement('div', { innerHTML: label }) : '';
     const indicator = newElement('div', { indicator: '' });
 
-    const iconActive = createIcon('mdi:radiobox-marked', ['checked', 'noobserver']);
-    const iconInactive = createIcon('mdi:circle-outline', ['unchecked', 'noobserver']);
+    const iconActive = createIcon('mdi:radiobox-marked', [
+      'checked',
+      'noobserver',
+    ]);
+    const iconInactive = createIcon('mdi:circle-outline', [
+      'unchecked',
+      'noobserver',
+    ]);
 
-    this.input = newElement('input', { ...getInputAttributes(this), type: 'radio' });
+    this.input = newElement('input', {
+      ...getInputAttributes(this),
+      type: 'radio',
+    });
 
     this.innerHTML = '';
 
@@ -59,7 +82,17 @@ export class WRadio extends HTMLElement {
     this.append(this.input, indicator, content);
     this.addEventListener('click', () => this.input.click());
     this.addEventListener('pointerdown', (event) => ripple(event, indicator));
-    this.input.addEventListener('keyup', (event) => clickWithSpaceAndEnter(event, indicator));
+    this.input.addEventListener('keyup', (event) =>
+      clickWithSpaceAndEnter(event, indicator)
+    );
+  }
+
+  get checked() {
+    return this.input.checked;
+  }
+
+  set checked(value) {
+    this.input.checked = value;
   }
 }
 

@@ -5,10 +5,6 @@ export class WCalendar extends HTMLElement {
   month = new Date().getMonth();
   year = new Date().getFullYear();
 
-  constructor() {
-    super();
-  }
-
   connectedCallback() {
     this.innerHTML = '';
 
@@ -22,8 +18,12 @@ export class WCalendar extends HTMLElement {
     const clickable = newElement('span', {
       clickable: '',
       append: [
-        createIcon('material-symbols:keyboard-arrow-left', { onclick: () => this.changeMonth(-1) }),
-        createIcon('material-symbols:keyboard-arrow-right', { onclick: () => this.changeMonth(1) }),
+        createIcon('material-symbols:keyboard-arrow-left', {
+          onclick: () => this.changeMonth(-1),
+        }),
+        createIcon('material-symbols:keyboard-arrow-right', {
+          onclick: () => this.changeMonth(1),
+        }),
       ],
     });
 
@@ -42,7 +42,9 @@ export class WCalendar extends HTMLElement {
   }
 
   getMonthName() {
-    return new Date(this.year, this.month).toLocaleString('default', { month: 'long' });
+    return new Date(this.year, this.month).toLocaleString('default', {
+      month: 'long',
+    });
   }
 
   changeMonth(delta) {
@@ -61,7 +63,8 @@ export class WCalendar extends HTMLElement {
     const firstDay = new Date(this.year, this.month, 1).getDay();
     const daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
     const today = new Date();
-    const isCurrentMonth = this.month === today.getMonth() && this.year === today.getFullYear();
+    const isCurrentMonth =
+      this.month === today.getMonth() && this.year === today.getFullYear();
 
     const container = newElement('div', ['days']);
 
@@ -74,7 +77,7 @@ export class WCalendar extends HTMLElement {
       const date = daysInPrevMonth - i;
       container.append(
         newElement('span', {
-          innerHTML: date,
+          text: date,
           other: '',
         })
       );
@@ -84,8 +87,8 @@ export class WCalendar extends HTMLElement {
     for (let day = 1; day <= daysInMonth; day++) {
       const isToday = isCurrentMonth && day === today.getDate();
       const span = newElement('span', {
-        innerHTML: day,
-        ...(isToday ? { active: '' } : {}),
+        text: day,
+        active: isToday,
       });
       container.append(span);
     }
@@ -96,7 +99,7 @@ export class WCalendar extends HTMLElement {
     for (let i = 1; i <= remaining; i++) {
       container.append(
         newElement('span', {
-          innerHTML: i,
+          text: i,
           other: '',
         })
       );

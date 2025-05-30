@@ -5,6 +5,8 @@ w-list {
 }
 
 w-list-item {
+  --surface: var(--pure);
+
   display: flex;
   align-items: center;
   gap: var(--xl);
@@ -14,7 +16,7 @@ w-list-item {
 
   border-radius: var(--xs);
 
-  background: var(--pure);
+  background: var(--surface);
   padding: var(--xl) var(--component-sm);
 
   &:first-child {
@@ -25,5 +27,23 @@ w-list-item {
   &:last-child {
     border-bottom-left-radius: var(--component-sm);
     border-bottom-right-radius: var(--component-sm);
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &[href] {
+    cursor: pointer;
+  }
+
+  [title] {
+    font-size: var(--font-lg);
+    font-weight: 500;
+  }
+
+  &:hover {
+    filter: brightness(0.99);
   }
 }

@@ -3,7 +3,7 @@ import '../components/index.js';
 
 import { ripple } from './events/ripple.js';
 
-window.onpointerdown = function (event) {
+window.onpointerdown = (event) => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
 

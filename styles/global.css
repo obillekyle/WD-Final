@@ -14,6 +14,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  line-height: 1.5;
+  color: var(--on-surface);
+
   background: var(--surface);
   -webkit-tap-highlight-color: transparent;
 }
@@ -58,4 +61,51 @@ iconify-icon {
 
 body:has(:not(:defined)) {
   display: none !important;
+}
+
+.account {
+  display: grid;
+  place-items: center;
+  width: var(--component-xl);
+  flex-shrink: 0;
+
+  aspect-ratio: 1;
+  border-radius: var(--component-xl);
+  background-color: var(--surface-container);
+  color: var(--on-surface-container);
+
+  position: relative;
+  cursor: pointer;
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  font-size: var(--component-xxs);
+  font-weight: 600;
+
+  [cog] {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
+    height: var(--component-xxs);
+    aspect-ratio: 1;
+
+    border-radius: var(--component-xxs);
+    background: var(--primary);
+
+    display: grid;
+    place-items: center;
+    font-size: var(--lg);
+    color: var(--surface);
+  }
+}
+
+.ripple {
+  user-select: none;
+
+  > * {
+    pointer-events: none;
+  }
 }

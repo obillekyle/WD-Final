@@ -1,4 +1,4 @@
-export async function usePasskey() {
+export async function createPasskey() {
   const challenge = new Uint8Array(32);
   crypto.getRandomValues(challenge);
 
@@ -35,5 +35,29 @@ export async function usePasskey() {
   }
 }
 
+export async function usePasskey() {
+  const challenge = new Uint8Array(32);
+  crypto.getRandomValues(challenge);
+
+  try {
+    const credential = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        timeout: 60000,
+        rpId: window.location.hostname,
+      },
+    });
+
+    if (!credential) return false;
+
+    return true;
+  } catch (err) {
+    console.warn('User canceled or error happened ❌', err);
+    return false;
+  }
+}
+
+// @ts-ignore
+window.createPasskey = createPasskey;
 // @ts-ignore
 window.usePasskey = usePasskey;

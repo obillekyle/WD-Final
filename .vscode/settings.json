@@ -11,6 +11,5 @@
     "comments": "",
     "textMateRules": []
   },
-  "iconify.annotations": false,
-  "iconify.inplace": true
+  "typescript.experimental.useTsgo": false
 }

@@ -1,0 +1,12 @@
+w-time {
+  [separator] {
+    margin: 0 5px;
+    animation: blink 1s infinite steps(2);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}

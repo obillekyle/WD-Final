@@ -74,4 +74,12 @@ w-radio {
 
     background: var(--surface-variant);
   }
+
+  &[disabled] {
+    pointer-events: none;
+
+    [indicator] {
+      opacity: 0.5;
+    }
+  }
 }

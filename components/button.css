@@ -85,9 +85,23 @@ w-drop-button {
     background: var(--primary);
   }
 
+  > div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  span {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   > iconify-icon {
     aspect-ratio: 1;
     padding-inline: var(--xxs) var(--xs);
+    flex-shrink: 0;
 
     background: var(--primary);
     border-radius: var(--xs) var(--component-sm) var(--component-sm) var(--xs);
@@ -100,5 +114,40 @@ w-drop-button {
       box-shadow: 0 0 0 1px inset var(--primary);
       color: var(--primary);
     }
+  }
+}
+
+w-button-icon {
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+
+  contain: content;
+  overflow: hidden;
+
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--rounded);
+
+  width: var(--component-md);
+  height: var(--component-md);
+  flex-shrink: 0;
+  color: var(--color, var(--on-surface));
+
+  [icon] {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+
+  &[active] {
+    background: var(--color, var(--primary));
+    color: var(--pure);
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
   }
 }

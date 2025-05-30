@@ -1,7 +1,7 @@
 w-content[dashboard] {
   .useful-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
     gap: var(--sm);
 
     .title {
@@ -47,8 +47,9 @@ w-content[dashboard] {
     height: 50%;
 
     background-image: url('../../assets/background.webp');
-    background-size: cover cover;
-    background-position: center center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     overflow: hidden;
     z-index: -1;
 
@@ -59,14 +60,14 @@ w-content[dashboard] {
       left: 0;
       right: 0;
       height: 100%;
-      background: linear-gradient(to bottom, transparent, var(--surface)),
+      background: linear-gradient(to bottom, transparent 30%, var(--surface)),
         linear-gradient(to right, var(--surface) 20%, transparent);
     }
   }
 
   .other-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
     gap: var(--sm);
 
     .title {
@@ -193,12 +194,29 @@ w-content[dashboard] {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: var(--xs);
+    flex: 1;
+    max-height: 300px;
+
+    position: relative;
+
+    &:empty:after {
+      content: 'There are no occupied rooms this time of day.';
+      position: absolute;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      text-wrap: balance;
+      inset: 0;
+    }
 
     .room {
       display: flex;
       flex-direction: column;
       gap: var(--xxs);
       aspect-ratio: 1;
+
+      align-items: center;
+      justify-content: center;
 
       position: relative;
       overflow: hidden;

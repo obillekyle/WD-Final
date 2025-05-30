@@ -50,3 +50,24 @@ w-header {
   color: var(--primary);
   font-weight: 700;
 }
+
+w-frame {
+  display: flex;
+  flex-direction: column;
+  background: var(--pure);
+  border-radius: var(--sm);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px inset var(--outline);
+}
+
+@media (width <= 768px) {
+  w-app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  w-content {
+    min-height: calc(100dvh - var(--navbar-size));
+    max-height: calc(100dvh - var(--navbar-size));
+  }
+}
