@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
-    <link rel="stylesheet" href="./styles/index.css" />
-    <link rel="stylesheet" href="./styles/app/account.css" />
+    <link rel="stylesheet" href="../styles/index.css" />
+    <link rel="stylesheet" href="../styles/app/add.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
-    <script src="./script/index.js" type="module"></script>
+    <script src="../script/index.js" type="module"></script>
 
-    <script src="./script/page/account.js" type="module"></script>
+    <script src="../script/page/edit/subject.js" type="module"></script>
   </head>
 
   <body>
@@ -80,57 +80,16 @@
       <w-content>
         <w-breakpoint>
           <div class="flex gap-auto">
-            <w-header> Settings & Options </w-header>
+            <w-header> Edit Subjects </w-header>
+            <w-button id="save">Save Changes</w-button>
           </div>
 
-          <w-list>
-            <w-list-item>
-              <div id="profile"> </div>
-              <div id="account-info"> </div>
-            </w-list-item>
-          </w-list>
-
-          <w-list>
-            <w-list-item>
-              <iconify-icon
-                icon="material-symbols:notifications-active-outline"
-              ></iconify-icon>
-              <div class="flex-col gap-xxs">
-                <span title>Recent Activities</span>
-                <span class="text-sub"
-                  >View recent activities and notifications</span
-                >
-              </div>
-            </w-list-item>
-
-            <w-list-item>
-              <iconify-icon icon="mdi:lock-open-outline"></iconify-icon>
-              <div class="flex-col gap-xxs">
-                <span title>Access Logs</span>
-                <span class="text-sub">View recent access logs</span>
-              </div>
-            </w-list-item>
-          </w-list>
-
-          <w-list>
-            <w-list-item href="./accounts.html">
-              <iconify-icon icon="mdi:account-cog-outline"></iconify-icon>
-              <div class="flex-col gap-xxs">
-                <span title>Account Management</span>
-                <span class="text-sub">Manage system accounts</span>
-              </div>
-            </w-list-item>
-          </w-list>
-
-          <w-list>
-            <w-list-item onclick="app.logout()">
-              <iconify-icon icon="mdi:logout"></iconify-icon>
-              <div class="flex-col gap-xxs">
-                <span title>Logout</span>
-                <span class="text-sub">Sign out of your account</span>
-              </div>
-            </w-list-item>
-          </w-list>
+          <w-frame>
+            <div class="edit-screen">
+              <div class="data" id="inputs"> </div>
+              <w-table class="preview" no-checkbox></w-table>
+            </div>
+          </w-frame>
         </w-breakpoint>
       </w-content>
     </w-app>

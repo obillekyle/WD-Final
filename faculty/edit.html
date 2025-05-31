@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../styles/index.css" />
+    <link rel="stylesheet" href="../styles/app/add.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+    <script src="../script/index.js" type="module"></script>
+
+    <script src="../script/page/edit/faculty.js" type="module"></script>
+  </head>
+
+  <body>
+    <w-app>
+      <w-navigation>
+        <img src="../assets/logo.webp" alt="Logo" id="nav-logo" />
+        <w-navigation-list>
+          <w-navigation-item
+            icon="material-symbols:home-outline"
+            href="./dashboard.html"
+            match="\/dashboard"
+          >
+            Home
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="mdi:teach"
+            href="./faculty.html"
+            match="\/faculty"
+          >
+            Faculty
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:book-ribbon-outline"
+            href="./subject.html"
+            match="\/subject"
+          >
+            Subjects
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:group-outline"
+            href="./section.html"
+            match="\/section"
+          >
+            Sections
+          </w-navigation-item>
+          <w-navigation-item
+            desktop
+            icon="material-symbols:meeting-room-outline"
+            href="./room.html"
+            match="\/room"
+          >
+            Rooms
+          </w-navigation-item>
+          <w-navigation-item
+            mobile
+            icon="material-symbols:id-card-outline"
+            href="./data.html"
+            match="\/data"
+          >
+            Data
+          </w-navigation-item>
+          <w-navigation-item
+            icon="material-symbols:calendar-month-outline"
+            href="./schedule.html"
+            match="\/schedule"
+          >
+            Schedule
+          </w-navigation-item>
+        </w-navigation-list>
+
+        <div class="account"> </div>
+      </w-navigation>
+      <w-content>
+        <w-breakpoint>
+          <div class="flex gap-auto">
+            <w-header> Add a faculty </w-header>
+            <w-button id="save">Save Changes</w-button>
+          </div>
+
+          <w-frame>
+            <div class="edit-screen">
+              <form class="data">
+                <w-input-divider>Personal Information</w-input-divider>
+                <w-input
+                  icon="material-symbols:badge-outline"
+                  name="title"
+                  label="Title"
+                  placeholder="Mr."
+                ></w-input>
+                <w-input
+                  icon="material-symbols:person-outline"
+                  name="fname"
+                  label="First Name"
+                  placeholder="Juan"
+                  required
+                ></w-input>
+                <w-input
+                  icon=" "
+                  name="lname"
+                  label="Last Name"
+                  placeholder="Dela Cruz"
+                  required
+                ></w-input>
+                <w-input
+                  icon=" "
+                  name="mname"
+                  label="Middle Name"
+                  placeholder="Antonio"
+                ></w-input>
+                <w-input
+                  icon="material-symbols:info-outline"
+                  name="suffix"
+                  label="Suffix"
+                  placeholder="Jr."
+                ></w-input>
+
+                <w-input-divider>Contact Information</w-input-divider>
+                <w-input
+                  icon="material-symbols:call-outline"
+                  name="contact"
+                  label="Phone Number"
+                  placeholder="09123456789"
+                  type="tel"
+                ></w-input>
+                <w-input
+                  name="email"
+                  icon="mdi:at"
+                  label="Email Address"
+                  type="email"
+                  placeholder="juandcruz@example.com"
+                ></w-input>
+
+                <w-input-divider>Work Preferences</w-input-divider>
+                <w-dropdown
+                  name="department"
+                  label="Cluster / Department"
+                  required
+                  id="department"
+                  icon="mingcute:department-line"
+                ></w-dropdown>
+                <w-dropdown
+                  name="shift"
+                  label="Prefered Shifting"
+                  required
+                  icon="material-symbols:work-history-outline-rounded"
+                >
+                  <w-option value="0">Both</w-option>
+                  <w-option value="1">AM</w-option>
+                  <w-option value="2">PM</w-option>
+                </w-dropdown>
+                <w-dropdown
+                  name="status"
+                  label="Employment Type"
+                  required
+                  icon="tabler:tie"
+                >
+                  <w-option value="0">Full Time</w-option>
+                  <w-option value="1">Part Time</w-option>
+                </w-dropdown>
+              </form>
+              <div class="preview"></div>
+            </div>
+          </w-frame>
+        </w-breakpoint>
+      </w-content>
+    </w-app>
+  </body>
+</html>

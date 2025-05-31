@@ -5,6 +5,38 @@ import { faculties, getFacultyName, programs } from '../../data.js';
 import { getFacultyCard } from '../../mgmt/faculty.js';
 
 const department = /** @type {WDropdown} */ (q$('#department'));
+const params = new URLSearchParams(window.location.search);
+
+const id = params.get('id') || '';
+const faculty = faculties[id];
+
+const preview = q$('.preview');
+const form = /** @type {HTMLFormElement} */ (q$('form'));
+const saveBtn = q$('#save');
+
+if (!faculty) {
+  document.body.append(
+    newElement('w-dialog', {
+      icon: 'material-symbols:warning',
+      title: 'Faculty not found',
+      text: 'The faculty you are trying to edit does not exist.',
+      append: [
+        newElement('w-button', {
+          text: 'Close',
+          type: 'close',
+          variant: 'outlined',
+          onclick: () => (location.href = '../faculty.html'),
+        }),
+      ],
+    })
+  );
+}
+
+if (form) {
+  Object.entries(faculty).forEach(([key, value]) => {
+    form[key].value = value;
+  });
+}
 
 if (department) {
   department.options = Object.entries(programs).map(([id, data]) => ({
@@ -13,13 +45,9 @@ if (department) {
   }));
 }
 
-const preview = q$('.preview');
-const form = /** @type {HTMLFormElement} */ (q$('form'));
-const saveBtn = q$('#save');
-
 preview && preview.append(getFacultyCard(faculties));
 form && form.addEventListener('input', () => debounce(updatePreview, 500));
-saveBtn && saveBtn.addEventListener('click', addFaculty);
+saveBtn && saveBtn.addEventListener('click', editFaculty);
 
 function updatePreview() {
   const formData = new FormData(form);
@@ -27,11 +55,12 @@ function updatePreview() {
   preview?.replaceChildren(getFacultyCard(Object.fromEntries(formData)));
 }
 
-function addFaculty() {
+updatePreview();
+
+function editFaculty() {
   if (form.checkValidity()) {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData);
-    const newId = Math.max(...Object.keys(faculties).map(Number)) + 1;
 
     /** @type {import('../../data.js').Faculty} */
     const newFaculty = {
@@ -47,14 +76,14 @@ function addFaculty() {
       contact: String(data.contact || ''),
     };
 
-    faculties[newId] = newFaculty;
+    faculties[id] = newFaculty;
 
     document.body.append(
       newElement('w-dialog', {
         icon: 'material-symbols:check',
-        title: 'Faculty added successfully',
+        title: 'Faculty edited successfully',
         text: `
-          The faculty ${getFacultyName(newId)} has been added successfully.
+          The faculty ${getFacultyName(id)} has been edited successfully.
         `,
         append: [
           newElement('slot', {

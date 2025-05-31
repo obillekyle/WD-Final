@@ -1,4 +1,4 @@
-import { NAME, ROLES, SCHEDULE, WEEKDAYS } from './enums.js';
+import { NAME, ROLES, SCHEDULE, SHIFTS, STATUS, WEEKDAYS } from './enums.js';
 import { getValue, setValue } from './storage.js';
 import { filteredJoin, getBrowserAndOS } from './utils.js';
 
@@ -56,6 +56,9 @@ export const profiles = getValue('profiles', {
   admin: '',
 });
 
+/** @type {Record<string, string>} */
+export const images = getValue('images', {});
+
 /**
  * @typedef {Object} Session
  * @prop {string} [loggedAs]
@@ -94,7 +97,8 @@ export const programs = getValue('programs', {
  * @prop {string} mname
  * @prop {string} suffix
  * @prop {string} department
- * @prop {string} status
+ * @prop {number} shift
+ * @prop {number} status
  * @prop {string} contact
  * @prop {string} email
  */
@@ -108,7 +112,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: '',
     department: 'BSIS',
-    status: 'Full-Time',
+    status: STATUS.FULL_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09171234567',
     email: 'miguel.dongatchalian@bpc.edu.ph',
   },
@@ -119,7 +124,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: '',
     department: 'BSIS',
-    status: 'Part-Time',
+    status: STATUS.FULL_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09281234567',
     email: 'joana.marie.cruz@bpc.edu.ph',
   },
@@ -130,7 +136,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: '',
     department: 'BSIS',
-    status: 'Full-Time',
+    status: STATUS.PART_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09391234567',
     email: 'jaymart.maala@bpc.edu.ph',
   },
@@ -141,7 +148,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: '',
     department: 'BSIS',
-    status: 'Part-Time',
+    status: STATUS.PART_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09471234567',
     email: 'deserie.robles@bpc.edu.ph',
   },
@@ -152,7 +160,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: '',
     department: 'BSIS',
-    status: 'Full-Time',
+    status: STATUS.FULL_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09581234567',
     email: 'lynzel.valenzuela@bpc.edu.ph',
   },
@@ -163,7 +172,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: '',
     department: 'BTVTED',
-    status: 'Part-Time',
+    status: STATUS.PART_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09691234567',
     email: 'glenn.beleber@bpc.edu.ph',
   },
@@ -174,7 +184,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: '',
     department: '',
-    status: 'Full-Time',
+    status: STATUS.FULL_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09771234567',
     email: 'eric.santiago@bpc.edu.ph',
   },
@@ -185,7 +196,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: 'PhD',
     department: 'BTVTED',
-    status: 'Part-Time',
+    status: STATUS.FULL_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09881234567',
     email: 'eliseo.amaninche@bpc.edu.ph',
   },
@@ -196,7 +208,8 @@ export const faculties = getValue('faculties', {
     mname: '',
     suffix: '',
     department: '',
-    status: 'Full-Time',
+    status: STATUS.FULL_TIME,
+    shift: SHIFTS.BOTH,
     contact: '09991234567',
     email: 'elizabeth.lagman@bpc.edu.ph',
   },
@@ -576,8 +589,13 @@ function dateToIndex(date = new Date()) {
   return Math.floor((totalMinutes - baseMinutes) / 30);
 }
 
+/**
+ * Get user image
+ * @param {string | number} userId
+ * @returns {string} image url
+ */
 export function getUserImage(userId) {
-  const user = accounts[userId];
+  const user = accounts[userId] || faculties[String(userId).slice(2)];
 
   if (!user) return '';
 
@@ -587,12 +605,17 @@ export function getUserImage(userId) {
     return picture;
   }
 
-  const firstLetter = user.fname[0].toUpperCase() || '?';
+  return getLetterAvatar(user.fname[0]);
+}
+
+export function getLetterAvatar(letter) {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
       <rect width="100%" height="100%" fill="#555" rx="16"/>
       <text x="50%" y="50%" font-size="64" fill="#fff" font-family="sans-serif"
-            text-anchor="middle" dominant-baseline="central">${firstLetter}</text>
+            text-anchor="middle" dominant-baseline="central">${String(
+              letter || '?'
+            ).toUpperCase()}</text>
     </svg>`;
 
   const base64 = svgToBase64(svg);
@@ -630,8 +653,6 @@ export function checkScheduleConflicts(
 ) {
   const conflicts = [];
 
-  // Flatten all existing schedules into a single array, including their room ID.
-  // Each schedule entry is enhanced with its room ID.
   const flattenedExistingSchedules = Object.entries(
     allExistingSchedules
   ).flatMap(([roomId, schedulesInRoom]) => {
@@ -640,8 +661,6 @@ export function checkScheduleConflicts(
       ...scheduleEntry,
     }));
   });
-
-  console.log(flattenedExistingSchedules);
 
   for (const existingSchedule of flattenedExistingSchedules) {
     if (newSchedule.id && newSchedule.id === existingSchedule.id) {

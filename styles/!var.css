@@ -75,7 +75,7 @@
   --inverse-on-surface: #fff;
 }
 
-/* @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
   :root {
     --primary: #81fbb8;
     --primary-light: #0a5433;
@@ -106,7 +106,7 @@
 
     color-scheme: dark;
   }
-} */
+}
 
 .flex {
   display: flex;
@@ -115,6 +115,11 @@
 .flex-col {
   display: flex;
   flex-direction: column;
+}
+
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .gap-xxs {

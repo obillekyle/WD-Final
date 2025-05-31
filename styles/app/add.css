@@ -1,0 +1,45 @@
+.edit-screen {
+  display: flex;
+  flex-wrap: wrap;
+
+  .data {
+    display: flex;
+    flex-direction: column;
+    padding: var(--xl);
+    gap: var(--sm);
+    width: min(100%, 400px);
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sm);
+      max-width: 100%;
+    }
+  }
+
+  .preview {
+    flex: 1;
+    min-width: 400px;
+    padding: var(--xl);
+    position: sticky;
+    top: var(--component-md);
+  }
+
+  w-table.preview {
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--sm);
+    padding: 0;
+    max-height: max-content;
+    margin: var(--xl);
+  }
+}
+
+@media (width <= 1024px) {
+  .edit-screen {
+    flex-direction: column;
+    .data {
+      flex: 1;
+      width: 100%;
+    }
+  }
+}

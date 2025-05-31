@@ -87,3 +87,16 @@ export const NAME = Object.freeze({
   /** Dr. Juan A. Dela Cruz */
   WITH_INITIAL_TITLE: 6,
 });
+
+/** @typedef {(typeof SHIFTS)[keyof typeof SHIFTS]} SHIFTS */
+export const SHIFTS = Object.freeze({
+  BOTH: 0,
+  AM: 1,
+  PM: 2,
+});
+
+/** @typedef {(typeof STATUS)[keyof typeof STATUS]} STATUS */
+export const STATUS = Object.freeze({
+  FULL_TIME: 0,
+  PART_TIME: 1,
+});

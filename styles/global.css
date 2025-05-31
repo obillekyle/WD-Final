@@ -23,6 +23,7 @@ body {
 
 * {
   outline: 0px solid var(--primary);
+  outline-offset: 2px;
 }
 
 :is(

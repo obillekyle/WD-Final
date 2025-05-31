@@ -159,12 +159,25 @@ export function getClientPos(event) {
 }
 
 /**
- * Creates a new element with attributes
- * @param {string} tagName
- * @param {Record<string, any> | string[]} [attributes]
- * @returns
+ * @template T
+ * @typedef {new (...args: any[]) => T | T} ElementType
  */
-export function newElement(tagName, attributes = {}) {
+
+/**
+ * @template T
+ * @typedef {{[key: string]: any, $?: ElementType<T>}} Attributes
+ */
+
+/**
+ * Creates a new element with attributes
+ * @template {Element} [E=HTMLElement]
+ * @param {string} tagName
+ * @param {Attributes<E>} [attributes]
+ * @param {ElementType<E>} [type]
+ * @returns {E}
+ */
+export function newElement(tagName, attributes = {}, type = undefined) {
+  /** @type {Element} */
   let element;
 
   switch (tagName) {
@@ -202,14 +215,14 @@ export function newElement(tagName, attributes = {}) {
   }
 
   bindAttrs(element, attributes);
-  return element;
+  return /** @type {E} */ (element);
 }
 
 /**
  * Binds attributes to an element
- * @template {HTMLElement | SVGElement} E
+ * @template {Element} [E=HTMLElement]
  * @param {E} element
- * @param {Record<string, any> | string[]} attributes
+ * @param {Attributes<E>} attributes
  * @returns {E}
  */
 
@@ -218,9 +231,13 @@ export function bindAttrs(element, attributes) {
     ? Object.fromEntries(
         attributes.map((/** @type {any} */ attr) => [attr, ''])
       )
-    : attributes;
+    : attributes || {};
 
   for (const [key, value] of Object.entries(attrArray)) {
+    if (key === '$') {
+      continue;
+    }
+
     if (value === undefined || value === null || value === false) {
       element.removeAttribute(key);
       continue;
@@ -260,22 +277,26 @@ export function bindAttrs(element, attributes) {
         continue;
       }
 
-      case 'style': {
-        if (typeof value === 'object') {
-          const cssArray = [];
-          for (const [prop, val] of Object.entries(value)) {
-            cssArray.push(`${prop}: ${val}`);
+      case 'style':
+        if (
+          'style' in element &&
+          element.style instanceof CSSStyleDeclaration
+        ) {
+          if (typeof value === 'object') {
+            const cssArray = [];
+            for (const [prop, val] of Object.entries(value)) {
+              cssArray.push(`${prop}: ${val}`);
+            }
+
+            element.style.cssText = cssArray.join('; ');
+            continue;
           }
 
-          element.style.cssText = cssArray.join('; ');
-          continue;
+          element.style.cssText = String(value);
         }
-
-        element.style.cssText = String(value);
         continue;
-      }
-
       case 'dataset': {
+        if (!(element instanceof HTMLElement)) continue;
         if (typeof value !== 'object') continue;
         Object.assign(element.dataset, value);
         continue;
@@ -496,4 +517,18 @@ export function debounce(callback, delay) {
 /** @type {(value: any, message?: string) => asserts value} */
 export function assert(value, message = 'Assertion failed') {
   if (!value) throw new Error(message);
+}
+
+/**
+ * @template {string | number} T
+ * @template K
+ * @param {T} value
+ * @param {[T, K][]} cases
+ * @param {K} [defaultValue]
+ * @returns {K | undefined}
+ */
+export function switchCase(value, cases, defaultValue) {
+  for (const [v, k] of cases) if (v === value) return k;
+
+  return defaultValue;
 }
