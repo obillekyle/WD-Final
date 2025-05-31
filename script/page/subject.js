@@ -57,8 +57,8 @@ deleteIcon?.addEventListener('click', () => {
   document.body.appendChild(
     newElement('w-dialog', {
       icon: 'material-symbols:delete-outline',
-      title: 'Delete Rooms',
-      html: 'Are you sure you want to delete the selected rooms?<br>This action cannot be undone.',
+      title: 'Delete Subjects',
+      html: 'Are you sure you want to delete the selected subjects?<br>This action cannot be undone.',
       append: [
         newElement('slot', {
           name: 'actions',
@@ -73,7 +73,7 @@ deleteIcon?.addEventListener('click', () => {
               class: 'error',
               onclick: (event) => {
                 for (const id of table.selected) {
-                  delete faculties[id];
+                  delete subjects[id];
                 }
                 table.data = getTableData();
                 table.refresh();
@@ -85,6 +85,11 @@ deleteIcon?.addEventListener('click', () => {
       ],
     })
   );
+});
+
+editIcon?.addEventListener('click', () => {
+  const ids = table.selected;
+  location.href = './subject/edit.html?ids=' + JSON.stringify(ids);
 });
 
 table.onchange = () => {

@@ -71,7 +71,7 @@ deleteIcon?.addEventListener('click', () => {
               class: 'error',
               onclick: (event) => {
                 for (const id of table.selected) {
-                  delete faculties[id];
+                  delete sections[id];
                 }
                 table.data = getTableData();
                 table.refresh();
@@ -83,6 +83,11 @@ deleteIcon?.addEventListener('click', () => {
       ],
     })
   );
+});
+
+editIcon?.addEventListener('click', () => {
+  const ids = table.selected;
+  location.href = './section/edit.html?ids=' + JSON.stringify(ids);
 });
 
 table.onchange = () => {

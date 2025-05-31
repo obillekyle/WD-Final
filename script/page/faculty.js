@@ -1,7 +1,8 @@
 import { WTable } from '../../components/table.js';
 import { faculties, getFacultyName } from '../data.js';
+import { SHIFTS, STATUS } from '../enums.js';
 import { isLoggedIn } from '../login.js';
-import { debounce, expose, newElement, q$ } from '../utils.js';
+import { debounce, expose, newElement, q$, switchCase } from '../utils.js';
 
 import './account-setup.js';
 
@@ -15,7 +16,8 @@ table.page = 1;
 table.columns = {
   name: 'Name',
   department: 'Department',
-  status: 'Preferred Shift',
+  shift: 'Preferred Shift',
+  status: 'Employment',
 };
 
 function getTableData() {
@@ -24,7 +26,15 @@ function getTableData() {
     name: getFacultyName(id),
     email: data.email,
     department: data.department,
-    status: data.status,
+    shift: switchCase(data.shift, [
+      [SHIFTS.BOTH, 'AM/PM'],
+      [SHIFTS.AM, 'AM'],
+      [SHIFTS.PM, 'PM'],
+    ]),
+    status: switchCase(data.status, [
+      [STATUS.FULL_TIME, 'Full Time'],
+      [STATUS.PART_TIME, 'Part Time'],
+    ]),
   }));
 }
 
@@ -79,9 +89,14 @@ deleteIcon?.addEventListener('click', () => {
   );
 });
 
+editIcon?.addEventListener('click', () => {
+  const id = table.selected[0];
+  location.href = './faculty/edit.html?id=' + id;
+});
+
 table.onchange = () => {
   deleteIcon?.toggleAttribute('disabled', !table.selected.length);
-  editIcon?.toggleAttribute('disabled', !table.selected.length);
+  editIcon?.toggleAttribute('disabled', table.selected.length !== 1);
 };
 
 expose('search', onSearch);

@@ -79,7 +79,7 @@ deleteIcon?.addEventListener('click', () => {
               class: 'error',
               onclick: (event) => {
                 for (const id of table.selected) {
-                  delete faculties[id];
+                  delete rooms[id];
                 }
                 table.data = getTableData();
                 table.refresh();
