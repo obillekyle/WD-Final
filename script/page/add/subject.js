@@ -4,7 +4,7 @@ import { WDropdown } from '../../../components/select.js';
 import { WInput } from '../../../components/input.js';
 import { WTable } from '../../../components/table.js';
 import '../account-setup.js';
-import { WDialog } from '../../../components/dialog.js';
+import { openDialog } from '../../../components/dialog.js';
 
 /** @type {(import('../../data.js').Subject & {id: string})[]} */
 
@@ -199,20 +199,18 @@ function saveChanges() {
       };
     }
 
-    document.body.append(
-      newElement('w-dialog', {
-        icon: 'material-symbols:info-outline',
-        title: 'Success',
-        text: 'Subjects added successfully.',
-        append: [
-          newElement('w-button', {
-            text: 'Close',
-            type: 'close',
-            variant: 'outlined',
-            onclick: () => (location.href = '../subject.html'),
-          }),
-        ],
-      })
-    );
+    openDialog({
+      icon: 'material-symbols:info-outline',
+      title: 'Success',
+      content: 'Subjects added successfully.',
+      actions: [
+        newElement('w-button', {
+          text: 'Close',
+          type: 'close',
+          variant: 'outlined',
+          href: '../subject.html',
+        }),
+      ],
+    });
   }
 }

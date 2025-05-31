@@ -20,17 +20,19 @@
   .preview {
     flex: 1;
     min-width: 400px;
+    max-width: 100%;
     padding: var(--xl);
     position: sticky;
-    top: var(--component-md);
+    display: flex;
+    flex-direction: column;
+    height: max-content;
+    top: 0;
   }
 
-  w-table.preview {
+  .preview w-table {
     border: 1px solid var(--outline-variant);
     border-radius: var(--sm);
-    padding: 0;
-    max-height: max-content;
-    margin: var(--xl);
+    width: 100%;
   }
 }
 

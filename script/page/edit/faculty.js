@@ -3,6 +3,7 @@ import '../account-setup.js';
 import { WDropdown } from '../../../components/select.js';
 import { faculties, getFacultyName, programs } from '../../data.js';
 import { getFacultyCard } from '../../mgmt/faculty.js';
+import { openDialog } from '../../../components/dialog.js';
 
 const department = /** @type {WDropdown} */ (q$('#department'));
 const params = new URLSearchParams(window.location.search);
@@ -78,29 +79,18 @@ function editFaculty() {
 
     faculties[id] = newFaculty;
 
-    document.body.append(
-      newElement('w-dialog', {
-        icon: 'material-symbols:check',
-        title: 'Faculty edited successfully',
-        text: `
-          The faculty ${getFacultyName(id)} has been edited successfully.
-        `,
-        append: [
-          newElement('slot', {
-            name: 'actions',
-            append: [
-              newElement('w-button', {
-                text: 'Close',
-                type: 'close',
-                onclick: () => {
-                  location.href = '../faculty.html';
-                },
-              }),
-            ],
-          }),
-        ],
-      })
-    );
+    openDialog({
+      icon: 'material-symbols:check',
+      title: 'Faculty edited successfully',
+      content: `The faculty ${getFacultyName(id)} has been edited successfully`,
+      actions: [
+        newElement('w-button', {
+          text: 'Close',
+          type: 'close',
+          href: '../faculty.html',
+        }),
+      ],
+    });
     return;
   }
 

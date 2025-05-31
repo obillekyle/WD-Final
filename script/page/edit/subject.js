@@ -3,8 +3,8 @@ import { debounce, newElement, q$ } from '../../utils.js';
 import { WDropdown } from '../../../components/select.js';
 import { WInput } from '../../../components/input.js';
 import { WTable } from '../../../components/table.js';
+import { openDialog } from '../../../components/dialog.js';
 import '../account-setup.js';
-import { WDialog } from '../../../components/dialog.js';
 
 const params = new URLSearchParams(window.location.search);
 let ids = JSON.parse(params.get('ids') || '');
@@ -17,26 +17,18 @@ const inputs = Object.fromEntries(
 );
 
 if (!ids.length || !Object.keys(inputs).length) {
-  document.body.append(
-    newElement('w-dialog', {
-      icon: 'material-symbols:warning',
-      title: 'No provided subjects',
-      text: 'No subjects were provided to edit.',
-      append: [
-        newElement('slot', {
-          name: 'actions',
-          append: [
-            newElement('w-button', {
-              text: 'Close',
-              type: 'close',
-              variant: 'outlined',
-              onclick: () => (location.href = '../subject.html'),
-            }),
-          ],
-        }),
-      ],
-    })
-  );
+  openDialog({
+    icon: 'material-symbols:warning',
+    title: 'No provided subjects',
+    content: 'No subjects were provided to edit.',
+    actions: [
+      newElement('w-button', {
+        text: 'Close',
+        type: 'close',
+        href: '../subjects.html',
+      }),
+    ],
+  });
 }
 
 console.log(inputs);
@@ -179,25 +171,18 @@ function saveChanges() {
       };
     }
 
-    document.body.append(
-      newElement('w-dialog', {
-        icon: 'material-symbols:info-outline',
-        title: 'Success',
-        text: 'Subjects edited successfully.',
-        append: [
-          newElement('slot', {
-            name: 'actions',
-            append: [
-              newElement('w-button', {
-                text: 'Close',
-                type: 'close',
-                variant: 'outlined',
-                onclick: () => (location.href = '../subject.html'),
-              }),
-            ],
-          }),
-        ],
-      })
-    );
+    openDialog({
+      icon: 'material-symbols:info-outline',
+      title: 'Success',
+      content: 'Subjects edited successfully.',
+      actions: [
+        newElement('w-button', {
+          text: 'Close',
+          type: 'close',
+          variant: 'outlined',
+          onclick: () => (location.href = '../subject.html'),
+        }),
+      ],
+    });
   }
 }
