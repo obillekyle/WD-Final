@@ -3,9 +3,6 @@ import { clickWithSpaceAndEnter } from './!util.js';
 export class Setup extends HTMLElement {
   #connected = 0;
 
-  /** @type {Node[]} */
-  #nodes = [];
-
   /** @type {Record<string, Node[]>} */
   #slots = new Proxy(Object.create({}), {
     get: (target, name) => target[name] || (target[name] = []),
@@ -16,7 +13,11 @@ export class Setup extends HTMLElement {
   });
 
   get nodes() {
-    return this.#nodes;
+    return this.#slots.default;
+  }
+
+  get slots() {
+    return this.#slots;
   }
 
   setup() {}
@@ -28,9 +29,9 @@ export class Setup extends HTMLElement {
       if (node.nodeName === 'TEMPLATE') {
         const t = /** @type {HTMLTemplateElement} */ (node);
         const slotName = t.getAttribute('name') || 'default';
-        this.#slots[slotName].push(...t.content.cloneNode(true).childNodes);
+        this.#slots[slotName].push(...t.content.childNodes);
       } else {
-        this.nodes.push(node.cloneNode(true));
+        this.nodes.push(node);
       }
     }
 

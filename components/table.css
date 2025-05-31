@@ -1,5 +1,6 @@
 w-table {
   position: relative;
+  max-width: 100%;
 
   [table] {
     display: flex;

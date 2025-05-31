@@ -10,18 +10,13 @@ export class WDialog extends Setup {
     const title = takeAttribute(this, 'title');
     const closeable = this.hasAttribute('closeable');
 
-    const slotButtons = this.querySelector('slot[name="actions"]');
-    const buttons = [...(slotButtons?.children || [])];
-
-    slotButtons?.remove();
-
     const content = newElement('div', {
       content: '',
       append: [
         createIcon(icon, ['top-icon']),
         newElement('div', { header: '', text: title }),
         newElement('div', { body: '', append: this.nodes }),
-        newElement('div', { actions: '', append: buttons }),
+        newElement('div', { actions: '', append: this.slots.actions }),
       ],
     });
 
@@ -29,9 +24,10 @@ export class WDialog extends Setup {
 
     this.replaceChildren(content);
 
-    for (const button of buttons) {
-      if (button.matches('[type="close"]'))
-        button.addEventListener('click', () => this.close());
+    for (const button of this.slots.actions) {
+      if (button instanceof HTMLElement)
+        if (button.matches('[type="close"]'))
+          button.addEventListener('click', () => this.close());
     }
 
     if (closeable) {
@@ -48,3 +44,27 @@ export class WDialog extends Setup {
 }
 
 customElements.define('w-dialog', WDialog);
+
+/**
+ * @typedef {Object} DialogOptions
+ * @prop {string} icon
+ * @prop {string} title
+ * @prop {boolean} closeable
+ * @prop {string | Node | (string | Node)[]} content
+ * @prop {(string | Node)[]} actions
+ */
+
+/** @param {Partial<DialogOptions>} options */
+export function openDialog({ icon, title, closeable, content, actions } = {}) {
+  document.body.append(
+    newElement('w-dialog', {
+      icon,
+      title,
+      closeable,
+      append: [
+        ...(Array.isArray(content) ? content : [content]),
+        newElement('template', { name: 'actions', append: actions }),
+      ],
+    })
+  );
+}
