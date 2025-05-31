@@ -1,6 +1,23 @@
 import { ripple } from '../script/events/ripple.js';
 import { bindAttrs, newElement } from '../script/utils.js';
 
+/**
+ * @overload
+ * @param {string} icon
+ * @param {import('../script/utils.js').Attributes<HTMLElement>} [attrs]
+ * @returns {HTMLElement}
+ */
+/**
+ * @overload
+ * @param {string | null} [icon]
+ * @param {import('../script/utils.js').Attributes<HTMLElement>} [attrs]
+ * @returns {HTMLElement | ''}
+ */
+/**
+ * @param {string | '' | undefined | null} icon
+ * @param {import('../script/utils.js').Attributes<HTMLElement>} [attrs]
+ * @returns {HTMLElement | ''}
+ */
 export function createIcon(icon, attrs = {}) {
   if (!icon) return '';
 
