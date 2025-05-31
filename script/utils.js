@@ -256,6 +256,12 @@ export function bindAttrs(element, attributes) {
     switch (key) {
       case 'append': {
         if (!Array.isArray(value)) continue;
+
+        if (element instanceof HTMLTemplateElement) {
+          element.content.append(...value);
+          continue;
+        }
+
         element.append(...value);
         continue;
       }
