@@ -1,21 +1,16 @@
 import { newElement } from '../script/utils.js';
+import { Setup } from './!mixins.js';
 
-export class WProgress extends HTMLElement {
-  progress;
-
-  constructor() {
-    super();
-  }
+export class WProgress extends Setup {
+  progress = newElement('div', ['progress']);
 
   static get observedAttributes() {
     return ['value'];
   }
 
-  connectedCallback() {
-    this.innerHTML = '';
-    this.progress = newElement('div', ['progress']);
-    this.style.setProperty('--value', String(this.value));
-    this.append(this.progress);
+  setup() {
+    this.value = this.value || 0;
+    this.replaceChildren(this.progress);
   }
 
   get value() {

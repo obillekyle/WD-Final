@@ -1,57 +1,33 @@
 import { ripple } from '../script/events/ripple.js';
 import { newElement } from '../script/utils.js';
-import { clickWithSpaceAndEnter, createIcon, takeAttribute } from './!util.js';
+import { Interactive } from './!mixins.js';
+import { createIcon, takeAttribute } from './!util.js';
 
 export class WNavigation extends HTMLElement {}
 
-export class WNavigationItem extends HTMLElement {
-  get href() {
-    return this.getAttribute('href');
-  }
-
-  get target() {
-    return this.getAttribute('target');
-  }
-
+export class WNavigationItem extends Interactive {
   bindActive() {
     const matchString = this.getAttribute('match');
 
-    if (!matchString) return;
-
-    const matcher = new RegExp(matchString);
-    this.classList.toggle('active', matcher.test(window.location.href));
+    if (matchString) {
+      const matcher = new RegExp(matchString);
+      this.classList.toggle('active', matcher.test(window.location.href));
+    }
   }
 
-  connectedCallback() {
-    const innerHTML = this.innerHTML;
+  setup() {
+    super.setup();
 
-    const icon = createIcon(takeAttribute(this, 'icon'), ['icon']);
-    const text = newElement('span', { innerHTML, label: '' });
+    const icon = createIcon(takeAttribute(this, 'icon'), ['indicator']);
+    const text = newElement('span', { append: this.nodes, label: '' });
 
-    this.innerHTML = '';
     this.disabled = this.hasAttribute('disabled');
 
-    this.append(icon, text);
+    this.replaceChildren(icon, text);
+    this.bindActive();
 
     this.addEventListener('pointerdown', ripple);
-    this.addEventListener('keyup', clickWithSpaceAndEnter.bind(this));
-    this.addEventListener('click', () => {
-      window.location.href = this.href || '#';
-    });
-
-    this.bindActive();
     window.addEventListener('locationchange', this.bindActive.bind(this));
-  }
-
-  get disabled() {
-    return this.hasAttribute('disabled');
-  }
-
-  set disabled(value) {
-    value
-      ? this.setAttribute('disabled', '')
-      : this.removeAttribute('disabled');
-    this.tabIndex = value ? -1 : 0;
   }
 }
 

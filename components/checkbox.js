@@ -1,5 +1,6 @@
 import { ripple } from '../script/events/ripple.js';
-import { newElement } from '../script/utils.js';
+import { bindAttrs, newElement } from '../script/utils.js';
+import { Setup } from './!mixins.js';
 import {
   takeAttribute,
   createIcon,
@@ -7,39 +8,39 @@ import {
   clickWithSpaceAndEnter,
 } from './!util.js';
 
-export class WCheckbox extends HTMLElement {
-  input;
+export class WBaseCheckbox extends Setup {
+  content = newElement('div');
+  input = newElement('input', {}, HTMLInputElement);
+  indicator = newElement('div', { indicator: '' });
 
-  connectedCallback() {
-    const innerHTML = this.innerHTML;
+  iActive = createIcon('mdi:checkbox-marked', ['checked', 'noobserver']);
+  iInactive = createIcon('mdi:checkbox-blank-outline', [
+    'unchecked',
+    'noobserver',
+  ]);
 
-    const indeterminate = this.hasAttribute('indeterminate');
-    const label = takeAttribute(this, 'label') || innerHTML;
-    const content = label ? newElement('div', { innerHTML: label }) : '';
-    const indicator = newElement('div', { indicator: '' });
+  setup() {
+    super.setup();
 
-    const iconActive = createIcon(
-      indeterminate ? 'mdi:minus-box' : 'mdi:checkbox-marked',
-      ['checked', 'noobserver']
-    );
-    const iconInactive = createIcon('mdi:checkbox-blank-outline', [
-      'unchecked',
-      'noobserver',
-    ]);
+    this.innerHTML = '';
+    this.role = this.getAttribute('role') || 'checkbox';
+    this.disabled = this.hasAttribute('disabled');
 
-    this.input = newElement('input', {
+    const label = takeAttribute(this, 'label');
+    this.content.append(...(label ? [label] : this.nodes));
+
+    this.input = bindAttrs(this.input, {
       ...getInputAttributes(this),
       type: 'checkbox',
     });
 
-    this.innerHTML = '';
+    this.append(this.input, this.indicator, this.content);
+    this.indicator.append(this.iInactive, this.iActive);
 
-    indicator.append(iconInactive, iconActive);
-    this.append(this.input, indicator, content);
     this.addEventListener('click', () => this.input.click());
-    this.addEventListener('pointerdown', (event) => ripple(event, indicator));
+    this.addEventListener('pointerdown', (e) => ripple(e, this.indicator));
     this.input.addEventListener('keyup', (event) =>
-      clickWithSpaceAndEnter(event, indicator)
+      clickWithSpaceAndEnter(event, this.indicator)
     );
   }
 
@@ -49,50 +50,34 @@ export class WCheckbox extends HTMLElement {
 
   set checked(value) {
     this.input.checked = value;
+  }
+
+  set disabled(value) {
+    this.input.disabled = value;
+    this.toggleAttribute('aria-disabled', value);
+    this.indicator.tabIndex = value ? -1 : 0;
+  }
+
+  get disabled() {
+    return this.input.disabled;
   }
 }
 
-export class WRadio extends HTMLElement {
-  input;
+export class WCheckbox extends WBaseCheckbox {
+  setup() {
+    super.setup();
 
+    const indeterminate = this.hasAttribute('indeterminate');
+    indeterminate && this.iActive.setAttribute('icon', 'mdi:minus-box');
+  }
+}
+
+export class WRadio extends WBaseCheckbox {
   connectedCallback() {
-    const innerHTML = this.innerHTML;
+    this.iActive.setAttribute('icon', 'mdi:radiobox-marked');
+    this.iInactive.setAttribute('icon', 'mdi:circle-outline');
 
-    const label = takeAttribute(this, 'label') || innerHTML;
-    const content = label ? newElement('div', { innerHTML: label }) : '';
-    const indicator = newElement('div', { indicator: '' });
-
-    const iconActive = createIcon('mdi:radiobox-marked', [
-      'checked',
-      'noobserver',
-    ]);
-    const iconInactive = createIcon('mdi:circle-outline', [
-      'unchecked',
-      'noobserver',
-    ]);
-
-    this.input = newElement('input', {
-      ...getInputAttributes(this),
-      type: 'radio',
-    });
-
-    this.innerHTML = '';
-
-    indicator.append(iconInactive, iconActive);
-    this.append(this.input, indicator, content);
-    this.addEventListener('click', () => this.input.click());
-    this.addEventListener('pointerdown', (event) => ripple(event, indicator));
-    this.input.addEventListener('keyup', (event) =>
-      clickWithSpaceAndEnter(event, indicator)
-    );
-  }
-
-  get checked() {
-    return this.input.checked;
-  }
-
-  set checked(value) {
-    this.input.checked = value;
+    this.input = bindAttrs(this.input, { type: 'radio' });
   }
 }
 

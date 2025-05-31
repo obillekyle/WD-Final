@@ -1,46 +1,22 @@
-import { newElement } from '../script/utils.js';
+import { bindAttrs, newElement } from '../script/utils.js';
+import { Setup } from './!mixins.js';
 import { createIcon, getInputAttributes, takeAttribute } from './!util.js';
 
-export class WInput extends HTMLElement {
+class WBaseInput extends Setup {
   /** @type {HTMLInputElement} */
-  input;
-  connected = false;
+  input = newElement('input', {}, HTMLInputElement);
 
-  connectedCallback() {
-    if (this.connected) return;
-    this.connected = true;
+  render() {}
 
-    const innerHTML = this.innerHTML;
+  setup() {
+    super.setup();
+    this.input = bindAttrs(this.input, getInputAttributes(this));
 
     this.innerHTML = '';
-
-    const icon1 = createIcon(takeAttribute(this, 'icon'));
-    const icon2 = createIcon(takeAttribute(this, 'right-icon'));
-    const prefix = takeAttribute(this, 'prefix');
-    const suffix = takeAttribute(this, 'suffix');
-    const label = takeAttribute(this, 'label') || innerHTML;
-
-    const content = newElement('div');
-    const iPrefix = prefix ? newElement('span', { innerHTML: prefix }) : '';
-    const iSuffix = suffix ? newElement('span', { innerHTML: suffix }) : '';
-    const iLabel = label ? newElement('span', { text: label, label: '' }) : '';
-
-    this.input = /** @type {any} */ (
-      newElement('input', getInputAttributes(this))
-    );
-
-    content.append(iLabel, iPrefix, this.input, iSuffix);
-
-    this.append(icon1, content, icon2);
     this.addEventListener('click', () => this.input.focus());
+    this.role = this.getAttribute('role') || 'textbox';
 
-    this.input.addEventListener('change', () =>
-      this.dispatchEvent(new Event('change'))
-    );
-
-    this.input.addEventListener('input', () =>
-      this.dispatchEvent(new Event('input'))
-    );
+    this.render();
   }
 
   get value() {
@@ -49,76 +25,91 @@ export class WInput extends HTMLElement {
 
   set value(value) {
     this.input.value = value;
+    this.dispatchEvent(new Event('input'));
+    this.dispatchEvent(new Event('change'));
+  }
+
+  set disabled(value) {
+    this.input.disabled = value;
+    this.toggleAttribute('aria-disabled', value);
+  }
+
+  get type() {
+    return this.input.type;
+  }
+
+  set type(value) {
+    this.input.type = value;
+  }
+
+  get disabled() {
+    return this.input.disabled;
+  }
+
+  get checked() {
+    return this.input.checked;
   }
 }
 
-export class WInputPass extends HTMLElement {
-  /** @type {HTMLInputElement} */
-  input;
-  /** @type {HTMLElement } */
-  visible;
-
-  connected = false;
-
-  connectedCallback() {
-    if (this.connected) return;
-    this.connected = true;
-
-    const innerHTML = this.innerHTML;
-
+export class WInput extends WBaseInput {
+  render() {
     const icon1 = createIcon(takeAttribute(this, 'icon'));
-    const label = takeAttribute(this, 'label') || innerHTML;
+    const icon2 = createIcon(takeAttribute(this, 'right-icon'));
+    const prefix = takeAttribute(this, 'prefix');
+    const suffix = takeAttribute(this, 'suffix');
+    const label = takeAttribute(this, 'label');
 
     const content = newElement('div');
-    const iLabel = label
-      ? newElement('span', { innerHTML: label, label: '' })
-      : '';
+    const iPrefix = prefix ? newElement('span', { html: prefix }) : '';
+    const iSuffix = suffix ? newElement('span', { html: suffix }) : '';
+    const iLabel = newElement('span', {
+      label: '',
+      append: label ? [label] : this.nodes,
+    });
 
-    this.visible = /** @type {any} */ (
-      createIcon('material-symbols:visibility-outline', ['eye'])
-    );
+    content.append(iLabel, iPrefix, this.input, iSuffix);
+    this.replaceChildren(icon1, content, icon2);
+  }
+}
 
-    this.input = /** @type {any} */ (
-      newElement('input', {
-        ...getInputAttributes(this),
-        type: 'password',
-      })
-    );
+export class WInputPass extends WBaseInput {
+  visible = createIcon('material-symbols:visibility-outline', {
+    onclick: () => this.toggleShow(),
+    eye: '',
+  });
 
-    content.append(iLabel, this.input);
+  render() {
+    const icon1 = createIcon(takeAttribute(this, 'icon'));
+    const label = takeAttribute(this, 'label');
 
-    this.innerHTML = '';
+    const content = newElement('div', {
+      append: [
+        newElement('span', { label: '', append: label ? [label] : this.nodes }),
+        this.input,
+      ],
+    });
 
+    this.type = 'password';
     this.append(icon1, content, this.visible);
-    this.addEventListener('click', () => this.input.focus());
-    this.visible.onclick = () => this.toggleShow();
   }
 
   toggleShow() {
-    switch (this.input.type) {
+    switch (this.type) {
       case 'password':
-        this.input.type = 'text';
+        this.type = 'text';
         this.visible.setAttribute(
           'icon',
           'material-symbols:visibility-off-outline'
         );
         break;
       case 'text':
-        this.input.type = 'password';
+        this.type = 'password';
         this.visible.setAttribute(
           'icon',
           'material-symbols:visibility-outline'
         );
         break;
     }
-  }
-
-  get value() {
-    return this.input.value;
-  }
-
-  set value(value) {
-    this.input.value = value;
   }
 }
 

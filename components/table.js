@@ -50,7 +50,10 @@ export class WTable extends HTMLElement {
     return data
       .filter((item) => {
         if (!this.#search) return true;
-        return item[this.#searchKey]?.includes(this.#search);
+        const search = String(this.#search).toLowerCase();
+        const value = String(item[this.#searchKey] || '').toLowerCase();
+
+        return value.includes(search);
       })
       .filter((_, index) => {
         return (
@@ -65,6 +68,8 @@ export class WTable extends HTMLElement {
   #render() {
     clearTimeout(this.#timeout);
 
+    const noCheckbox = this.hasAttribute('no-checkbox');
+
     this.#timeout = setTimeout(() => {
       this.innerHTML = '';
 
@@ -73,18 +78,20 @@ export class WTable extends HTMLElement {
       const head = newElement('div', {
         header: '',
         append: [
-          newElement('w-checkbox', {
-            disabled: filteredData.length === 0,
-            checked: this.selected.length > 0,
-            indeterminate:
-              this.selected.length > 0 &&
-              filteredData.length !== this.selected.length,
-            onchange: (event) => {
-              this.selected = event.target.checked
-                ? filteredData.map((item) => item.id)
-                : [];
-            },
-          }),
+          noCheckbox
+            ? ''
+            : newElement('w-checkbox', {
+                disabled: filteredData.length === 0,
+                checked: this.selected.length > 0,
+                indeterminate:
+                  this.selected.length > 0 &&
+                  filteredData.length !== this.selected.length,
+                onchange: (event) => {
+                  this.selected = event.target.checked
+                    ? filteredData.map((item) => item.id)
+                    : [];
+                },
+              }),
           ...Object.entries(this.#columns).map(([key, value]) => {
             return newElement('div', {
               text: value,
@@ -106,21 +113,23 @@ export class WTable extends HTMLElement {
           return newElement('div', {
             row: '',
             append: [
-              newElement('w-checkbox', {
-                checked: this.selected.includes(item.id),
-                onchange: (event) => {
-                  if (event.target.checked) this.selected.push(item.id);
-                  else
-                    this.selected = this.selected.filter(
-                      (id) => id !== item.id
-                    );
-                },
-              }),
+              noCheckbox
+                ? ''
+                : newElement('w-checkbox', {
+                    checked: this.selected.includes(item.id),
+                    onchange: (event) => {
+                      if (event.target.checked) this.selected.push(item.id);
+                      else
+                        this.selected = this.selected.filter(
+                          (id) => id !== item.id
+                        );
+                    },
+                  }),
               ...Object.entries(this.#columns).map(([key]) => {
                 const newItem =
-                  typeof item[key] === 'string'
-                    ? { text: item[key] }
-                    : item[key];
+                  typeof item[key] === 'object'
+                    ? item[key]
+                    : { text: String(item[key]) };
 
                 return newElement('div', newItem);
               }),
@@ -139,9 +148,7 @@ export class WTable extends HTMLElement {
         pagination: '',
         append: [
           newElement('div', {
-            text: `Page ${this.#currentPage} of ${Math.ceil(
-              filteredData.length / this.#pageSize
-            )}`,
+            text: `Page ${this.#currentPage} of ${this.maxPage()}`,
           }),
           newElement('div', {
             append: [
@@ -189,7 +196,7 @@ export class WTable extends HTMLElement {
   }
 
   maxPage() {
-    return Math.ceil(this.#data.length / this.#pageSize);
+    return Math.max(1, Math.ceil(this.#data.length / this.#pageSize));
   }
 
   set columns(columns) {
@@ -238,7 +245,7 @@ export class WTable extends HTMLElement {
   }
 
   set page(page) {
-    this.#currentPage = Math.max(Math.min(page, 1), this.maxPage());
+    this.#currentPage = Math.min(Math.max(page, 1), this.maxPage());
     this.#render();
   }
 

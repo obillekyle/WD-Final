@@ -52,11 +52,12 @@ w-header {
 }
 
 w-frame {
+  --surface: var(--pure);
+
   display: flex;
   flex-direction: column;
   background: var(--pure);
   border-radius: var(--sm);
-  overflow: hidden;
   box-shadow: 0 0 0 1px inset var(--outline);
 }
 

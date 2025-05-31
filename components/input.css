@@ -124,4 +124,15 @@ w-input-divider {
   justify-content: space-between;
   text-transform: uppercase;
   gap: var(--xxs);
+
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+
+  height: var(--xl);
+
+  iconify-icon {
+    cursor: pointer;
+  }
 }

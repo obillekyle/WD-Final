@@ -18,77 +18,133 @@ export class WDropdown extends HTMLElement {
 
   /** @type {any} */
   #renderId = -1;
-  #checked = -1;
 
-  /** @type {HTMLElement[]} */
+  /** @type {Element[]} */
   #elements = [];
 
   #optionContainer = newElement('div', ['options']);
   #othersContainer = newElement('div', ['others']);
   #selectContainer = newElement('div', ['select']);
 
-  /** @type {HTMLElement | ''} */
+  /** @type {Element | ''} */
   #firstIcon;
   #replacedIcon;
+  connected = false;
 
   /** @type {HTMLInputElement} */
   input;
 
-  /** @type {HTMLElement} */
+  /** @type {Element} */
   display;
 
   constructor() {
     super();
 
     this.options = [];
+    this.toggle = this.toggle.bind(this);
+    this.documentClick = this.documentClick.bind(this);
+  }
+
+  /**
+   * @param {any} [state]
+   */
+  toggle(state) {
+    state = typeof state === 'boolean' ? state : !this.hasAttribute('open');
+    this.toggleAttribute('open');
+  }
+
+  documentClick(event) {
+    if (this.matches(':focus-within')) return;
+    if (!this.contains(/** @type {any} */ (event.target))) {
+      this.removeAttribute('open');
+    }
   }
 
   connectedCallback() {
-    const innerHTML = this.innerHTML;
+    if (!this.connected) {
+      this.connected = true;
 
-    this.innerHTML = '';
-    this.#firstIcon = createIcon(takeAttribute(this, 'icon'), ['left-icon']);
+      const innerHTML = this.innerHTML;
 
-    this.display = newElement('span', ['display']);
-    const icon2 = createIcon('material-symbols:expand-more', ['expand']);
+      this.innerHTML = '';
+      this.#firstIcon = createIcon(takeAttribute(this, 'icon'), ['left-icon']);
 
-    const prefix = takeAttribute(this, 'prefix');
-    const suffix = takeAttribute(this, 'suffix');
-    const label = takeAttribute(this, 'label');
+      this.display = newElement('span', ['display']);
+      const icon2 = createIcon('material-symbols:expand-more', ['expand']);
 
-    this.#othersContainer.innerHTML = innerHTML;
+      const prefix = takeAttribute(this, 'prefix');
+      const suffix = takeAttribute(this, 'suffix');
+      const label = takeAttribute(this, 'label');
 
-    this.input = /** @type {any} */ (
-      newElement('input', {
-        ...getInputAttributes(this),
-        type: 'text',
-        onchange: (event) => {
-          this.value = /** @type {any} */ (event.target).value;
+      this.#othersContainer.innerHTML = innerHTML;
+
+      this.input = /** @type {any} */ (
+        newElement('input', {
+          ...getInputAttributes(this),
+          type: 'text',
+          onchange: (/** @type {{ target: any; }} */ event) => {
+            this.value = /** @type {any} */ (event.target).value;
+          },
+          onfocus: () => this.toggleAttribute('open', true),
+          onblur: () => this.toggleAttribute('open', false),
+          oninput: () => {
+            this.input.value = this.value;
+          },
+        })
+      );
+
+      new MutationObserver(() => {
+        this.#setChecked();
+        console.log('update');
+      }).observe(this.input, {
+        attributes: true,
+        attributeFilter: ['value'],
+      });
+
+      const descriptor = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        'value'
+      );
+
+      Object.defineProperty(this.input, 'value', {
+        get: () => {
+          const data = descriptor?.get?.call(this.input);
+          return this.#options.find((o) => o.value === data)?.value || '';
         },
-        onfocus: () => this.toggleAttribute('open', true),
-        onblur: () => this.toggleAttribute('open', false),
-      })
-    );
+        set: (val) => {
+          descriptor?.set?.call(this.input, val);
+          this.dispatchEvent(new Event('change', { bubbles: true }));
+          this.dispatchEvent(new Event('input', { bubbles: true }));
+          this.#setChecked();
+        },
+      });
 
-    const content = newElement('div');
-    const iPrefix = prefix ? newElement('span', { html: prefix }) : '';
-    const iSuffix = suffix ? newElement('span', { html: suffix }) : '';
-    const iLabel = label ? newElement('span', { html: label, label: '' }) : '';
+      const content = newElement('div');
+      const iPrefix = prefix ? newElement('span', { html: prefix }) : '';
+      const iSuffix = suffix ? newElement('span', { html: suffix }) : '';
+      const iLabel = label
+        ? newElement('span', { html: label, label: '' })
+        : '';
 
-    content.append(iLabel, iPrefix, this.display, this.input, iSuffix);
+      content.append(iLabel, iPrefix, this.display, this.input, iSuffix);
 
-    this.#selectContainer.append(this.#firstIcon, content, icon2);
-    this.#othersContainer.innerHTML = innerHTML;
+      this.#selectContainer.append(this.#firstIcon, content, icon2);
+      this.#othersContainer.innerHTML = innerHTML;
 
-    this.input.tabIndex = -1;
+      this.append(
+        this.#selectContainer,
+        this.#optionContainer,
+        this.#othersContainer
+      );
+    }
 
-    this.append(
-      this.#selectContainer,
-      this.#optionContainer,
-      this.#othersContainer
-    );
+    this.addEventListener('click', this.toggle);
+    document.addEventListener('click', this.documentClick);
+  }
 
-    this.addEventListener('click', () => this.toggleAttribute('open'));
+  disconnectedCallback() {
+    this.removeEventListener('click', this.toggle);
+    document.removeEventListener('click', this.documentClick);
   }
 
   #setChecked() {
@@ -99,11 +155,14 @@ export class WDropdown extends HTMLElement {
 
     this.display.innerHTML = '';
 
-    const checked = this.#options[this.#checked];
+    const index = this.#options.findIndex(({ value }) => value === this.value);
+    const checked = this.#options[index];
 
-    if (!checked) return;
+    if (!checked) {
+      return;
+    }
 
-    this.#elements[this.#checked]?.setAttribute('checked', '');
+    this.#elements[index]?.setAttribute('checked', '');
     this.display.innerHTML = checked.label || checked.value;
 
     if (checked.icon) {
@@ -137,7 +196,6 @@ export class WDropdown extends HTMLElement {
         this.#elements[index] = newElement('div', {
           option: '',
           disbled: option.disabled,
-          checked: index === this.#checked,
 
           append: [
             createIcon(option.icon),
@@ -174,20 +232,11 @@ export class WDropdown extends HTMLElement {
   }
 
   get value() {
-    return this.#options[this.#checked]?.value || '';
+    return this.input.value || '';
   }
 
   set value(value) {
-    const newValue = String(value);
-    this.#checked = this.#options.findIndex(
-      (option) => option.value === newValue
-    );
-
-    console.log(value);
-    this.input.value = this.#options[this.#checked]?.value || '';
-    this.#setChecked();
-
-    this.dispatchEvent(new Event('change'));
+    this.input.value = value;
   }
 }
 

@@ -1,8 +1,11 @@
+import { Setup } from './!mixins.js';
 import { newElement } from '../script/utils.js';
 import { createIcon, takeAttribute } from './!util.js';
 
-export class WDialog extends HTMLElement {
-  connectedCallback() {
+export class WDialog extends Setup {
+  setup() {
+    super.setup();
+
     const icon = takeAttribute(this, 'icon');
     const title = takeAttribute(this, 'title');
     const closeable = this.hasAttribute('closeable');
@@ -12,23 +15,19 @@ export class WDialog extends HTMLElement {
 
     slotButtons?.remove();
 
-    const elements = [...this.childNodes];
-    console.log(elements);
-    this.innerHTML = '';
-
     const content = newElement('div', {
       content: '',
       append: [
         createIcon(icon, ['top-icon']),
         newElement('div', { header: '', text: title }),
-        newElement('div', { body: '', append: elements }),
+        newElement('div', { body: '', append: this.nodes }),
         newElement('div', { actions: '', append: buttons }),
       ],
     });
 
     setTimeout(() => this.setAttribute('open', ''), 20);
 
-    this.append(content);
+    this.replaceChildren(content);
 
     for (const button of buttons) {
       if (button.matches('[type="close"]'))

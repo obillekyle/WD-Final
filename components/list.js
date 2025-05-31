@@ -1,15 +1,13 @@
 import { ripple } from '../script/events/ripple.js';
+import { Interactive, Setup } from './!mixins.js';
 
 export class WList extends HTMLElement {}
 
-export class WListItem extends HTMLElement {
-  connectedCallback() {
+export class WListItem extends Interactive {
+  setup() {
+    super.setup();
     this.addEventListener('pointerdown', ripple);
-
-    this.addEventListener('click', (event) => {
-      if (this.hasAttribute('href') && !this.hasAttribute('disabled'))
-        window.location.href = this.getAttribute('href') || '#';
-    });
+    this.replaceChildren(...this.nodes);
   }
 }
 

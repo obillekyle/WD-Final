@@ -1,8 +1,9 @@
 // reference: https://github.com/obillekyle/components/blob/alpha/packages/lib/src/components/Progress/circular-progress.vue
 
 import { assert, bindAttrs, newElement } from '../script/utils.js';
+import { Setup } from './!mixins.js';
 
-export class WCircularProgress extends HTMLElement {
+export class WCircularProgress extends Setup {
   attrs = {
     diameter: 48,
     stroke: 5,
@@ -11,7 +12,7 @@ export class WCircularProgress extends HTMLElement {
   };
 
   /** @type {any} */
-  rerenderTimeout = null;
+  renderTimeout = null;
 
   get circle() {
     const { value, diameter, stroke } = this.attrs;
@@ -45,42 +46,38 @@ export class WCircularProgress extends HTMLElement {
     svg: newElement('svg', {
       svg: '',
       preserveAspectRatio: 'xMidYMid meet',
+      $: SVGElement,
     }),
     circle: newElement('circle', {
       circle: '',
       cx: '50%',
       cy: '50%',
+      $: SVGCircleElement,
     }),
     background: newElement('circle', {
       background: '',
       cx: '50%',
       cy: '50%',
+      $: SVGCircleElement,
     }),
     content: newElement('div', {
       content: '',
     }),
   };
 
-  connectedCallback() {
-    if (this.initialized) return;
-    this.initialized = true;
-
-    const innerHTML = this.innerHTML;
-    this.innerHTML = '';
-
-    this.elements.svg.append(this.elements.circle, this.elements.background);
-
+  setup() {
     this.bindProps();
-    this.append(this.elements.svg, this.elements.content);
+    this.elements.content.replaceChildren(...this.nodes);
+    this.elements.svg.append(this.elements.circle, this.elements.background);
+    this.replaceChildren(this.elements.svg, this.elements.content);
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (!this.initialized) return;
+    if (!this.isConnected) return;
     if (['diameter', 'stroke', 'value', 'rotate'].includes(name)) {
       this.attrs[name] = newValue;
-      clearTimeout(this.rerenderTimeout);
-
-      this.rerenderTimeout = setTimeout(() => this.bindProps());
+      clearTimeout(this.renderTimeout);
+      this.renderTimeout = setTimeout(() => this.bindProps());
     }
   }
 
@@ -93,8 +90,6 @@ export class WCircularProgress extends HTMLElement {
   }
 
   bindProps() {
-    if (!this.initialized) return;
-
     this.attrs = {
       diameter: Number(this.getAttribute('diameter') || this.attrs.diameter),
       stroke: Number(this.getAttribute('stroke') || this.attrs.stroke),
@@ -120,14 +115,8 @@ export class WCircularProgress extends HTMLElement {
       },
     });
 
-    bindAttrs(this.elements.circle, {
-      r: this.circle.radius,
-    });
-
-    bindAttrs(this.elements.background, {
-      r: this.circle.radius,
-    });
-
+    bindAttrs(this.elements.circle, { r: this.circle.radius });
+    bindAttrs(this.elements.background, { r: this.circle.radius });
     bindAttrs(this.elements.content, {
       style: {
         width: `${this.attrs.diameter - this.attrs.stroke * 2}px`,

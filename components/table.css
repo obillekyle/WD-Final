@@ -21,19 +21,23 @@ w-table {
 
     > *:not(w-checkbox) {
       flex: 1;
-      min-width: 200px;
+      min-width: 150px;
     }
 
     > div:first-of-type {
-      min-width: min(50dvw, 400px);
+      width: min(32dvw, 300px);
       justify-content: start;
     }
+
     > div {
       display: flex;
       align-items: center;
       user-select: none;
       cursor: pointer;
       justify-content: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       text-align: center;
 
       iconify-icon {
@@ -88,16 +92,19 @@ w-table {
 
     > *:not(w-checkbox) {
       flex: 1;
-      min-width: 200px;
+      width: 150px;
     }
 
     > div:first-of-type {
-      min-width: min(50dvw, 400px);
+      width: min(32dvw, 300px);
       text-align: start;
     }
 
     > div {
       text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
