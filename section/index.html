@@ -6,12 +6,11 @@
     <title>Document</title>
 
     <link rel="stylesheet" href="/@styles/index.css" />
-    <link rel="stylesheet" href="/@styles/app/add.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
     <script src="/@script/index.js" type="module"></script>
 
-    <script src="./edit.js" type="module"></script>
+    <script src="./index.js" type="module"></script>
   </head>
 
   <body>
@@ -80,17 +79,40 @@
       <w-content>
         <w-breakpoint>
           <div class="flex gap-auto">
-            <w-header> Edit Subjects </w-header>
-            <w-button id="save">Save Changes</w-button>
+            <w-header> Section Management </w-header>
+            <w-drop-button>Add Sections</w-drop-button>
           </div>
 
           <w-frame>
-            <div class="edit-screen">
-              <div class="data" id="inputs"> </div>
-              <div class="preview">
-                <w-table no-checkbox></w-table>
-              </div>
+            <div class="flex">
+              <w-button-icon
+                icon="material-symbols:delete-outline"
+                id="delete"
+                disabled
+              >
+                Delete
+              </w-button-icon>
+              <w-button-icon
+                icon="material-symbols:edit-outline"
+                id="edit"
+                disabled
+              >
+                Edit
+              </w-button-icon>
+              <w-button-icon icon="material-symbols:refresh" id="refresh">
+                Refresh
+              </w-button-icon>
+
+              <w-input
+                icon="material-symbols:search"
+                class="ml-auto"
+                placeholder="Search"
+                oninput="app.search(event)"
+              >
+                Search
+              </w-input>
             </div>
+            <w-table></w-table>
           </w-frame>
         </w-breakpoint>
       </w-content>

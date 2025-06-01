@@ -1,0 +1,10 @@
+@import url('/@components/index.css');
+
+.components {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  padding: var(--lg);
+  gap: var(--sm);
+}

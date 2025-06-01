@@ -5,78 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
-    <link rel="stylesheet" href="./styles/index.css" />
-    <link rel="stylesheet" href="./styles/app/account.css" />
+    <link rel="stylesheet" href="/@styles/index.css" />
+    <link rel="stylesheet" href="/@styles/app/account.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
-    <script src="./script/index.js" type="module"></script>
+    <script src="/@script/index.js" type="module"></script>
 
-    <script src="./script/page/account.js" type="module"></script>
+    <script src="/@script/page/account.js" type="module"></script>
   </head>
 
   <body>
     <w-app>
-      <w-navigation>
-        <img src="../assets/logo.webp" alt="Logo" id="nav-logo" />
-        <w-navigation-list>
-          <w-navigation-item
-            icon="material-symbols:home-outline"
-            href="./dashboard.html"
-            match="\/dashboard"
-          >
-            Home
-          </w-navigation-item>
-          <w-navigation-item
-            desktop
-            icon="mdi:teach"
-            href="./faculty.html"
-            match="\/faculty"
-          >
-            Faculty
-          </w-navigation-item>
-          <w-navigation-item
-            desktop
-            icon="material-symbols:book-ribbon-outline"
-            href="./subject.html"
-            match="\/subject"
-          >
-            Subjects
-          </w-navigation-item>
-          <w-navigation-item
-            desktop
-            icon="material-symbols:group-outline"
-            href="./section.html"
-            match="\/section"
-          >
-            Sections
-          </w-navigation-item>
-          <w-navigation-item
-            desktop
-            icon="material-symbols:meeting-room-outline"
-            href="./room.html"
-            match="\/room"
-          >
-            Rooms
-          </w-navigation-item>
-          <w-navigation-item
-            mobile
-            icon="material-symbols:id-card-outline"
-            href="./data.html"
-            match="\/data"
-          >
-            Data
-          </w-navigation-item>
-          <w-navigation-item
-            icon="material-symbols:calendar-month-outline"
-            href="./schedule.html"
-            match="\/schedule"
-          >
-            Schedule
-          </w-navigation-item>
-        </w-navigation-list>
-
-        <div class="account"> </div>
-      </w-navigation>
+      <w-navigation></w-navigation>
       <w-content>
         <w-breakpoint>
           <div class="flex gap-auto">
@@ -113,7 +53,7 @@
           </w-list>
 
           <w-list>
-            <w-list-item href="./accounts.html">
+            <w-list-item href="./accounts/index.html">
               <iconify-icon icon="mdi:account-cog-outline"></iconify-icon>
               <div class="flex-col gap-xxs">
                 <span title>Account Management</span>

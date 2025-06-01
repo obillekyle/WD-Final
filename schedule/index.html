@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link rel="stylesheet" href="/@styles/index.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+    <script src="/@script/index.js" type="module"></script>
+
+    <script src="./index.js" type="module"></script>
+  </head>
+
+  <body>
+    <w-app>
+      <w-navigation></w-navigation>
+      <w-content>
+        <w-breakpoint>
+          <w-header> Schedule Management </w-header>
+          <div class="flex-col gap-md">
+            <div class="flex gap-xxs" id="scheduleChips">
+              <w-chip icon="material-symbols:meeting-room-outline">Room</w-chip>
+              <w-chip
+                icon="material-symbols:book-ribbon-outline"
+                variant="outlined"
+                >Subject</w-chip
+              >
+              <w-chip icon="material-symbols:group-outline" variant="outlined"
+                >Section</w-chip
+              >
+            </div>
+            <w-box id="scheduleInput"></w-box>
+          </div>
+
+          <table class="sched-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </w-breakpoint>
+      </w-content>
+    </w-app>
+
+    <form class="sidebar" onclick="closeSidebar(event)">
+      <div class="sidebar-content">
+        <div title>Faculty Management</div>
+
+        <div class="flex-col gap-md w-fill">
+          <w-dropdown
+            icon="material-symbols:group-outline"
+            id="facultyInput"
+            label="Faculty Member"
+            required
+          ></w-dropdown>
+
+          <w-dropdown
+            icon="material-symbols:meeting-room-outline"
+            label="Room"
+            id="roomInput"
+            required
+          >
+          </w-dropdown>
+
+          <w-dropdown
+            icon="material-symbols:book-ribbon-outline"
+            id="subjectInput"
+            label="Subject"
+            required
+          >
+          </w-dropdown>
+
+          <w-dropdown
+            icon="material-symbols:group-outline"
+            id="sectionInput"
+            label="Section"
+            required
+          >
+          </w-dropdown>
+          <w-dropdown
+            icon="material-symbols:calendar-month-outline"
+            id="dayInput"
+            label="Day"
+            required
+          >
+          </w-dropdown>
+          <div class="flex gap-xxs">
+            <w-dropdown
+              icon="material-symbols:timer-outline"
+              id="startInput"
+              label="Start"
+              required
+            >
+            </w-dropdown>
+            <w-dropdown
+              icon="material-symbols:timer-outline"
+              id="endInput"
+              label="End"
+              required
+            >
+            </w-dropdown>
+          </div>
+        </div>
+
+        <div class="flex gap-auto">
+          <w-button type="reset" variant="outlined" class="error">Delete</w-button>
+          <w-button type="submit">Save</w-button>
+        </div>
+      </div>
+    </form>
+  </body>
+</html>

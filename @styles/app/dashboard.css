@@ -1,0 +1,242 @@
+w-content[dashboard] {
+  .useful-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: var(--sm);
+
+    .title {
+      font-size: var(--font-lg);
+      font-weight: 600;
+    }
+
+    .value {
+      font-size: var(--component-md);
+      font-weight: 700;
+    }
+
+    w-card:nth-child(1) {
+      color: var(--primary);
+    }
+
+    w-card:nth-child(2) {
+      color: var(--secondary);
+    }
+
+    w-card:nth-child(3) {
+      color: var(--tertiary);
+    }
+
+    w-card:nth-child(4) {
+      color: var(--error);
+    }
+
+    [accent] {
+      position: absolute;
+      right: var(--xxs);
+      bottom: calc(var(--xs) * -1);
+      opacity: 0.5;
+      font-size: var(--component-lg);
+    }
+  }
+
+  #background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+
+    background-image: url('/@assets/background.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    z-index: -1;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent 30%, var(--surface)),
+        linear-gradient(to right, var(--surface) 20%, transparent);
+    }
+  }
+
+  .other-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+    gap: var(--sm);
+
+    .title {
+      font-size: var(--font-lg);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sm);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: var(--xxs);
+      user-select: none;
+    }
+
+    .action {
+      text-decoration: none;
+      color: inherit;
+
+      display: flex;
+      padding: var(--md) var(--xs);
+
+      flex-direction: column;
+      text-align: center;
+      gap: var(--md);
+
+      position: relative;
+      overflow: hidden;
+
+      box-shadow: 0 0 0 1px inset var(--outline);
+      border-radius: var(--xs);
+      background: var(--pure);
+
+      font-size: var(--font-sm);
+      cursor: pointer;
+
+      transition: all 0.2s var(--timing-standard);
+
+      * {
+        pointer-events: none;
+      }
+
+      iconify-icon {
+        display: grid;
+        place-items: center;
+      }
+
+      &:hover {
+        background: var(--surface);
+      }
+    }
+  }
+
+  .card-button {
+    text-decoration: none;
+    color: inherit;
+
+    display: flex;
+    align-items: center;
+    gap: var(--sm);
+
+    position: relative;
+    overflow: hidden;
+
+    border-radius: var(--xs);
+    padding-inline: var(--sm);
+    height: var(--component-sm);
+
+    font-weight: 600;
+
+    transition: all 0.2s var(--timing-standard);
+
+    &:hover {
+      background: var(--surface-variant);
+    }
+  }
+
+  .teaching-load {
+    display: flex;
+    align-items: center;
+    gap: var(--sm);
+
+    iconify-icon {
+      display: grid;
+      place-items: center;
+
+      font-size: var(--component-md);
+      color: var(--secondary);
+    }
+
+    .value {
+      font-size: var(--component-sm);
+      font-weight: 600;
+    }
+  }
+
+  .schedule {
+    display: flex;
+    align-items: center;
+    gap: var(--sm);
+
+    [info] {
+      display: flex;
+      flex-direction: column;
+      gap: var(--xxs);
+      font-weight: 500;
+    }
+
+    .text-sub {
+      font-weight: 400;
+      font-size: var(--font-sm);
+    }
+  }
+
+  .room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--xs);
+    flex: 1;
+    max-height: 300px;
+
+    position: relative;
+
+    &:empty:after {
+      content: 'There are no occupied rooms this time of day.';
+      position: absolute;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      text-wrap: balance;
+      inset: 0;
+    }
+
+    .room {
+      display: flex;
+      flex-direction: column;
+      gap: var(--xxs);
+      aspect-ratio: 1;
+
+      align-items: center;
+      justify-content: center;
+
+      position: relative;
+      overflow: hidden;
+
+      box-shadow: 0 0 0 1px inset var(--outline);
+      border-radius: var(--xs);
+      background: var(--pure);
+
+      font-size: var(--font-sm);
+      cursor: pointer;
+
+      transition: all 0.2s var(--timing-standard);
+
+      * {
+        pointer-events: none;
+      }
+
+      &:hover {
+        background: var(--surface);
+      }
+    }
+  }
+}

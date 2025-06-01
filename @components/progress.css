@@ -1,0 +1,38 @@
+w-progress {
+  display: block;
+
+  position: relative;
+  overflow: hidden;
+
+  width: 100%;
+  height: var(--sm);
+  border-radius: var(--rounded);
+
+  [progress] {
+    position: absolute;
+    height: 100%;
+    left: 0;
+    right: calc(var(--value, 0) * 1%);
+    background: var(--primary);
+    border-radius: var(--rounded);
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    height: 100%;
+    right: 0;
+    border-radius: var(--rounded);
+  }
+
+  &::before {
+    left: calc((var(--value, 0) * 1%) + var(--xxs));
+    background: var(--surface-variant);
+  }
+
+  &::after {
+    aspect-ratio: 1;
+    background: var(--primary);
+  }
+}

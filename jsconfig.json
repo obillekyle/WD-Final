@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "checkJs": true,                 
+    "allowJs": true,                 
+    "noEmit": true,                  
+    "strict": true,  
+    "lib": ["esnext", "dom", "DOM.Iterable"],                
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "/@components/*": ["@components/*"],
+      "/@script/*": ["@script/*"],
+      "/@styles/*": ["@styles/*"]
+    }                 
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".git"
+  ]
+}
+

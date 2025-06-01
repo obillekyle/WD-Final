@@ -1,0 +1,141 @@
+@import url('./dashboard.css');
+@import url('./schedule.css');
+
+.login-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xl);
+
+  position: relative;
+  overflow: hidden;
+  contain: content;
+
+  height: 100dvh;
+  max-width: 100%;
+  width: clamp(var(--breakpoint-mobile), 50dvw, var(--breakpoint-tablet));
+
+  padding: var(--component-md);
+
+  color: var(--surface);
+
+  w-header {
+    color: currentColor;
+    text-transform: uppercase;
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  &::before {
+    background-image: url('/@assets/background.webp');
+    background-size: cover;
+    background-position: right 10% center;
+    background-repeat: no-repeat;
+  }
+
+  &::after {
+    background: linear-gradient(to bottom in lch, var(--primary), var(--black));
+    opacity: 0.8;
+  }
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xl);
+
+  margin-block: auto;
+
+  padding-inline: var(--component-xxl);
+  width: min(100%, 600px);
+
+  w-input,
+  w-input-pass {
+    width: 100%;
+  }
+
+  w-button {
+    width: 100%;
+    border-radius: var(--xxs);
+  }
+}
+
+#nav-logo {
+  width: var(--size-lg);
+}
+
+.profile-card {
+  --surface: var(--pure);
+
+  display: grid;
+  gap: var(--sm);
+  height: max-content;
+  box-shadow: 0 0 0 1px var(--outline);
+  border-radius: var(--sm);
+
+  position: relative;
+  overflow: hidden;
+  contain: content;
+
+  padding: var(--xl);
+  padding-top: var(--component-lg);
+
+  [cover] {
+    height: var(--size-xl);
+    position: absolute;
+    width: 100%;
+    top: 0;
+    background-color: var(--surface-variant);
+    background-position: center;
+    background-size: cover;
+    z-index: -1;
+  }
+
+  [name] {
+    font-size: var(--font-xl);
+    font-weight: 700;
+  }
+
+  [avatar] {
+    height: var(--size-xl);
+    aspect-ratio: 1;
+
+    outline: var(--xs) solid var(--surface);
+    outline-offset: 0;
+
+    border-radius: var(--rounded);
+    background-size: cover;
+    overflow: hidden;
+  }
+}
+
+@media (width <= 1024px) {
+  body:has(#login-form) {
+    w-app {
+      grid-template-columns: 1fr;
+      place-items: center;
+
+      background-image: linear-gradient(to bottom, var(--primary), #0000), url('/@assets/background.webp'),;
+      background-size: cover, cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #login-form {
+      --surface: var(--pure);
+      padding: var(--component-md);
+      border-radius: var(--md);
+      background: var(--pure);
+      box-shadow: 0 0 0 1px inset var(--outline);
+    }
+
+    .login-sidebar {
+      display: none;
+    }
+  }
+}
