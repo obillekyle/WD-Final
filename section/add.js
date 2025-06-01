@@ -1,45 +1,52 @@
 import { openDialog } from "/@components/dialog.js";
 import { WInput } from "/@components/input.js";
 import { WDropdown } from "/@components/select.js";
-import { programs, subjects } from "../@script/data.js";
-import { debounce, newElement, q$ } from "../@script/utils.js";
+import { WTable } from "/@components/table.js";
+import { programs, sections } from "../@script/data.js";
+import { assert, debounce, newElement, q$ } from "../@script/utils.js";
 
 import "/@script/page/account-setup.js";
 
-/** @type {(import('../@script/data.js').Subject & {id: string})[]} */
+/** @type {(import('../@script/data.js').Section)[]} */
 
 const inputs = [
 	{
-		id: "",
 		program: "",
-		title: "",
-		units: 0,
+		section: "",
+		year: 0,
 	},
 ];
 
 const saveBtn = q$("#save");
 const inputsContainer = q$("#inputs");
-const table = /** @type {import("@components/table").WTable} */ (q$("w-table"));
+const table = q$("w-table", null, WTable);
 const dropdownItems = Object.entries(programs).map(([id, data]) => ({
 	value: id,
 	label: data.name,
 }));
 
-saveBtn?.addEventListener("click", saveChanges);
+const yearItems = [
+	{ value: "1", label: "First Year" },
+	{ value: "2", label: "Second Year" },
+	{ value: "3", label: "Third Year" },
+	{ value: "4", label: "Fourth Year" },
+];
 
+saveBtn?.addEventListener("click", saveChanges);
+assert(table, "Table not found");
 // render table
 
 table.page = 1;
 table.columns = {
-	title: "Subject Name",
-	id: "Subject Code",
 	program: "Program",
-	units: "Credit Units",
+	section: "Section",
+	year: "Year",
 };
 
 table.data = inputs;
 
 function renderTable() {
+	assert(table, "Table not found");
 	table.data = inputs;
 	table.refresh();
 }
@@ -58,13 +65,13 @@ function renderInputs() {
 	inputsContainer.innerHTML = "";
 
 	inputs.forEach((input, index) => {
-		const { program, title, units, id } = input;
+		const { program, section, year } = input;
 
 		const form = newElement("form", { id: `form-${index}` });
 		const divider = newElement("w-input-divider", {
 			append: [
 				newElement("span", {
-					text: `Subject ${index + 1}`,
+					text: `Section ${index + 1}`,
 				}),
 				newElement("iconify-icon", {
 					icon: "material-symbols:remove",
@@ -76,90 +83,62 @@ function renderInputs() {
 			],
 		});
 
-		const codeInput = newElement(
-			"w-input",
-			{
-				label: "Subject Code (unique)",
-				name: "code",
-				icon: "material-symbols:book-outline",
-				pattern: "^[A-Z0-9\\-]{3,}$",
-				required: true,
-				placeholder: "ABC-123",
-				value: id,
-				onchange: () => {
-					input.id = codeInput.value;
-				},
-			},
-			WInput,
-		);
+		const programs = newElement("w-dropdown", {
+			$: WDropdown,
+			name: "program",
+			label: "Program",
+			icon: "mingcute:department-line",
+			required: true,
+			value: program,
+		});
 
-		const programs = newElement(
-			"w-dropdown",
-			{
-				name: "program",
-				label: "Program",
-				icon: "mingcute:department-line",
-				required: true,
-				placeholder: "Select Program",
-				value: program,
-			},
-			WDropdown,
-		);
+		const yearInput = newElement("w-dropdown", {
+			$: WDropdown,
+			name: "program",
+			label: "Year",
+			icon: "mdi:graduation-cap-outline",
+			required: true,
+			value: year,
+		});
 
+		yearInput.options = yearItems;
 		programs.options = dropdownItems;
+
 		programs.onchange = () => {
 			input.program = programs.value;
 		};
 
-		const unitsInput = newElement(
-			"w-input",
-			{
-				label: "Units",
-				type: "number",
-				icon: "material-symbols:star-outline",
-				name: "units",
-				required: true,
-				min: 1,
-				max: 3,
-				value: units,
-				onchange: () => {
-					input.units = Number(unitsInput.value || 0);
-				},
-			},
-			WInput,
-		);
+		yearInput.onchange = () => {
+			input.year = Number(yearInput.value);
+		};
 
-		const titleInput = newElement(
-			"w-input",
-			{
-				label: "Program Title",
-				icon: "mdi:card-text-outline",
-				name: "title",
-				required: true,
-				value: title,
-				onchange: () => {
-					input.title = titleInput.value;
-				},
+		const sectionInput = newElement("w-input", {
+			$: WInput,
+			name: "section",
+			icon: "material-symbols:star-outline",
+			required: true,
+			placeholder: "A",
+			value: section,
+			onchange: () => {
+				input.section = sectionInput.value;
 			},
-			WInput,
-		);
+		});
 
-		form.append(divider, codeInput, titleInput, programs, unitsInput);
+		form.append(divider, programs, yearInput, sectionInput);
 		inputsContainer.append(form);
 	});
 
 	inputsContainer.append(
 		newElement("w-button", {
-			text: "Add Subject",
+			text: "Add Section",
 			type: "button",
 			class: "ml-auto",
 			variant: "outlined",
 			onclick: () => {
 				inputs.push({
-					id: "",
 					program: "",
-					title: "",
-					units: 0,
+					section: "",
+					year: 0,
 				});
 				renderInputs();
 			},
@@ -181,28 +160,23 @@ function saveChanges() {
 			valid = false;
 			break;
 		}
-
-		if (form.code.value.toLowerCase() in subjects) {
-			valid = false;
-			form.code.setCustomValidity("Subject code already exists");
-			form.reportValidity();
-			break;
-		}
 	}
 
 	if (valid) {
+		let maxId = Math.max(...Object.keys(sections).map(Number)) + 1;
+
 		for (const input of inputs) {
-			subjects[input.id.toLowerCase()] = {
-				title: input.title,
+			sections[maxId++] = {
 				program: input.program,
-				units: input.units,
+				section: input.section,
+				year: input.year,
 			};
 		}
 
 		openDialog({
 			icon: "material-symbols:info-outline",
 			title: "Success",
-			content: "Subjects added successfully.",
+			content: "Sections added successfully.",
 			actions: [
 				newElement("w-button", {
 					text: "Close",

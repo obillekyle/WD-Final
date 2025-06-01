@@ -226,7 +226,6 @@ export class WTable extends HTMLElement {
 		this.#timeout2 = setTimeout(() => {
 			this.#dataText = {};
 			for (const item of this.#data) {
-				console.log(item);
 				this.#dataText[item.id] = getTextFromAttribute(item);
 			}
 		});

@@ -86,4 +86,8 @@ table.onchange = () => {
 	editIcon?.toggleAttribute("disabled", !table.selected.length);
 };
 
+editIcon?.addEventListener("click", () => {
+	location.href = `./edit.html?id=${JSON.stringify(table.selected)}`;
+});
+
 expose("search", onSearch);

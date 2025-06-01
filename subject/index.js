@@ -76,7 +76,7 @@ deleteIcon?.addEventListener("click", () => {
 
 editIcon?.addEventListener("click", () => {
 	const ids = table.selected;
-	location.href = `./subject/edit.html?ids=${JSON.stringify(ids)}`;
+	location.href = `./edit.html?ids=${JSON.stringify(ids)}`;
 });
 
 table.onchange = () => {

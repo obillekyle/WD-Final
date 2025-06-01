@@ -89,7 +89,7 @@ deleteIcon?.addEventListener("click", () => {
 
 editIcon?.addEventListener("click", () => {
 	const id = table.selected[0];
-	location.href = `./faculty/edit.html?id=${id}`;
+	location.href = `./edit.html?id=${id}`;
 });
 
 table.onchange = () => {
