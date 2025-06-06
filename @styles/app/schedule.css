@@ -71,6 +71,7 @@
 }
 
 .sidebar {
+  
   position: absolute;
   content: contain;
   overflow: hidden;
@@ -113,8 +114,48 @@
   }
 }
 .selected {
-  background: var(--primary-light);
-  color: var(--primary);
+
+  position: relative;
+  z-index: 5;
+
+  &::after {
+    content: '';
+    color: var(--primary);
+    position: absolute;
+    pointer-events: none;
+    inset: calc(var(--xxs) * -1);
+    border-left: 2px solid var(--primary);
+    border-right: 2px solid var(--primary);
+    background-color: color-mix(in srgb, #0000, var(--primary) 20%);
+    top: 0;
+    bottom: -1px;
+
+  }
+
+  &.start::after {
+    top: calc(var(--xxs) * -1);
+    border-top: 2px solid var(--primary);
+    border-top-left-radius: var(--xxs);
+    border-top-right-radius: var(--xxs);
+    content: 'Drag down to select';
+    display: grid;
+    place-items: center;
+
+
+  }
+  
+  &.end::after {
+    bottom: calc(var(--xxs) * -1);
+    border-bottom: 2px solid var(--primary);
+    border-bottom-left-radius: var(--xxs);
+    border-bottom-right-radius: var(--xxs);
+  }
+
+}
+
+.conflict {
+  text-align: left;
+
 }
 
 #scheduleInput {

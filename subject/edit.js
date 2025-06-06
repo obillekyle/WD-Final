@@ -2,18 +2,19 @@ import { openDialog } from "/@components/dialog.js";
 import { WInput } from "/@components/input.js";
 import { WDropdown } from "/@components/select.js";
 import { WTable } from "/@components/table.js";
-import { programs, subjects } from "/@script/data.js";
+import { Program, Subject } from "/@script/blueprint.js";
 import { assert, debounce, newElement, q$ } from "/@script/utils.js";
+
 import "/@script/page/account-setup.js";
 
-const params = new URLSearchParams(window.location.search);
-const ids = JSON.parse(params.get("ids") || "");
+const params = new URLSearchParams(location.search);
+const ids = JSON.parse((params.get("ids") || "").toLowerCase());
 
-/** @type {Record<string, import('@script/data').Subject>} */
+/** @type {Record<string, Subject>} */
 const inputs = Object.fromEntries(
 	ids
-		.map((id) => [id.toLowerCase(), { ...subjects[id.toLowerCase()] }])
-		.filter(([id]) => id in subjects),
+		.map((id) => [id, { ...Subject.get(id) }])
+		.filter(([id]) => id in Subject.data),
 );
 
 if (!ids.length || !Object.keys(inputs).length) {
@@ -25,7 +26,7 @@ if (!ids.length || !Object.keys(inputs).length) {
 			newElement("w-button", {
 				text: "Close",
 				type: "close",
-				href: "../subjects.html",
+				href: "./index.html",
 			}),
 		],
 	});
@@ -34,7 +35,7 @@ if (!ids.length || !Object.keys(inputs).length) {
 const saveBtn = q$("#save");
 const inputsContainer = q$("#inputs");
 const table = q$("w-table", null, WTable);
-const dropdownItems = Object.entries(programs).map(([id, data]) => ({
+const dropdownItems = Object.entries(Program.data).map(([id, data]) => ({
 	value: id,
 	label: data.name,
 }));
@@ -165,11 +166,10 @@ function saveChanges() {
 
 	if (valid) {
 		for (const [index, input] of Object.entries(inputs)) {
-			subjects[index.toLowerCase()] = {
-				title: input.title,
-				program: input.program,
-				units: input.units,
-			};
+			Subject.data[index.toLowerCase()] = new Subject({
+				id: index,
+				...input,
+			});
 		}
 
 		openDialog({

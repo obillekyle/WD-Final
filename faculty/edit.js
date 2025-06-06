@@ -1,6 +1,6 @@
 import { openDialog } from "/@components/dialog.js";
 import { WDropdown } from "/@components/select.js";
-import { faculties, getFacultyName, programs } from "/@script/data.js";
+import { Faculty, Program } from "/@script/blueprint.js";
 import { getFacultyCard } from "/@script/mgmt/faculty.js";
 import { debounce, newElement, q$ } from "/@script/utils.js";
 import "/@script/page/account-setup.js";
@@ -9,7 +9,7 @@ const department = q$("#department", null, WDropdown);
 const params = new URLSearchParams(window.location.search);
 
 const id = params.get("id") || "";
-const faculty = faculties[id];
+const faculty = Faculty.get(id);
 
 const saveBtn = q$("#save");
 const preview = q$(".preview");
@@ -37,20 +37,22 @@ if (form) {
 }
 
 if (department) {
-	department.options = Object.entries(programs).map(([id, data]) => ({
+	department.options = Object.entries(Program.data).map(([id, data]) => ({
 		value: id,
 		label: data.name,
 	}));
 }
 
-preview?.append(getFacultyCard(faculties));
+preview?.append(getFacultyCard(faculty));
 saveBtn?.addEventListener("click", editFaculty);
 form?.addEventListener("input", () => debounce(updatePreview, 500));
 
 function updatePreview() {
 	const formData = new FormData(form);
 
-	preview?.replaceChildren(getFacultyCard(Object.fromEntries(formData)));
+	preview?.replaceChildren(
+		getFacultyCard(new Faculty(Object.fromEntries(formData))),
+	);
 }
 
 updatePreview();
@@ -60,26 +62,17 @@ function editFaculty() {
 		const formData = new FormData(form);
 		const data = Object.fromEntries(formData);
 
-		/** @type {import('@script/data').Faculty} */
-		const newFaculty = {
-			title: String(data.title || ""),
-			fname: String(data.fname),
-			lname: String(data.lname),
-			mname: String(data.mname || ""),
-			suffix: String(data.suffix || ""),
-			email: String(data.email),
-			department: String(data.department || ""),
-			status: Number(data.status),
-			shift: Number(data.shift),
-			contact: String(data.contact || ""),
-		};
+		const newFaculty = new Faculty({
+			id,
+			...data,
+		});
 
-		faculties[id] = newFaculty;
+		Faculty.data[id] = newFaculty;
 
 		openDialog({
 			icon: "material-symbols:check",
 			title: "Faculty edited successfully",
-			content: `The faculty ${getFacultyName(id)} has been edited successfully`,
+			content: `The faculty ${newFaculty.formatName()} has been edited successfully`,
 			actions: [
 				newElement("w-button", {
 					text: "Close",

@@ -1,14 +1,12 @@
+import { WCheckbox } from "/@components/checkbox.js";
 import { openDialog } from "/@components/dialog.js";
 import { WInput } from "/@components/input.js";
 import { WDropdown } from "/@components/select.js";
-import { rooms } from "../@script/data.js";
+import { WTable } from "/@components/table.js";
+import { Room } from "/@script/blueprint.js";
 import { assert, debounce, newElement, q$ } from "../@script/utils.js";
 
 import "/@script/page/account-setup.js";
-import WCheckbox from "/@components/checkbox.js";
-import { WTable } from "/@components/table.js";
-
-/** @type {(import('../@script/data.js').Room & {id: string})[]} */
 
 const inputs = [
 	{
@@ -180,7 +178,7 @@ function saveChanges() {
 			break;
 		}
 
-		if (form.code.value in rooms) {
+		if (form.code.value in Room.data) {
 			valid = false;
 			form.code.setCustomValidity("Subject code already exists");
 			form.reportValidity();
@@ -190,11 +188,7 @@ function saveChanges() {
 
 	if (valid) {
 		for (const input of inputs) {
-			rooms[input.id] = {
-				name: input.name,
-				available: input.available,
-				type: input.type,
-			};
+			Room.data[input.id] = new Room(input);
 		}
 
 		openDialog({

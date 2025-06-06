@@ -1,33 +1,27 @@
+import { WTable } from "@components/table";
 import { openDialog } from "/@components/dialog.js";
 import { WInput } from "/@components/input.js";
 import { WDropdown } from "/@components/select.js";
-import { programs, subjects } from "../@script/data.js";
-import { debounce, newElement, q$ } from "../@script/utils.js";
+import { Subject } from "/@script/blueprint.js";
+import { assert, debounce, newElement, q$ } from "../@script/utils.js";
 
 import "/@script/page/account-setup.js";
 
-/** @type {(import('../@script/data.js').Subject & {id: string})[]} */
-
-const inputs = [
-	{
-		id: "",
-		program: "",
-		title: "",
-		units: 0,
-	},
-];
+const inputs = [new Subject()];
 
 const saveBtn = q$("#save");
 const inputsContainer = q$("#inputs");
-const table = /** @type {import("@components/table").WTable} */ (q$("w-table"));
-const dropdownItems = Object.entries(programs).map(([id, data]) => ({
+const table = q$("w-table", null, WTable);
+const dropdownItems = Object.entries(Subject.data).map(([id, data]) => ({
 	value: id,
-	label: data.name,
+	label: data.title,
 }));
 
 saveBtn?.addEventListener("click", saveChanges);
 
 // render table
+
+assert(table, "Table not found");
 
 table.page = 1;
 table.columns = {
@@ -40,6 +34,7 @@ table.columns = {
 table.data = inputs;
 
 function renderTable() {
+	assert(table, "Table not found");
 	table.data = inputs;
 	table.refresh();
 }
@@ -58,7 +53,7 @@ function renderInputs() {
 	inputsContainer.innerHTML = "";
 
 	inputs.forEach((input, index) => {
-		const { program, title, units, id } = input;
+		const { program, title, units, _id } = input;
 
 		const form = newElement("form", { id: `form-${index}` });
 		const divider = newElement("w-input-divider", {
@@ -85,9 +80,9 @@ function renderInputs() {
 				pattern: "^[A-Z0-9\\-]{3,}$",
 				required: true,
 				placeholder: "ABC-123",
-				value: id,
+				value: _id,
 				onchange: () => {
-					input.id = codeInput.value;
+					input._id = codeInput.value;
 				},
 			},
 			WInput,
@@ -155,12 +150,7 @@ function renderInputs() {
 			class: "ml-auto",
 			variant: "outlined",
 			onclick: () => {
-				inputs.push({
-					id: "",
-					program: "",
-					title: "",
-					units: 0,
-				});
+				inputs.push(new Subject());
 				renderInputs();
 			},
 		}),
@@ -182,7 +172,7 @@ function saveChanges() {
 			break;
 		}
 
-		if (form.code.value.toLowerCase() in subjects) {
+		if (form.code.value.toLowerCase() in Subject.data) {
 			valid = false;
 			form.code.setCustomValidity("Subject code already exists");
 			form.reportValidity();
@@ -192,11 +182,7 @@ function saveChanges() {
 
 	if (valid) {
 		for (const input of inputs) {
-			subjects[input.id.toLowerCase()] = {
-				title: input.title,
-				program: input.program,
-				units: input.units,
-			};
+			Subject.data[input._id] = input;
 		}
 
 		openDialog({
@@ -208,7 +194,7 @@ function saveChanges() {
 					text: "Close",
 					type: "close",
 					variant: "outlined",
-					href: "../subject.html",
+					href: "./index.html",
 				}),
 			],
 		});

@@ -1,33 +1,47 @@
 /**
+ * @template {object | any[]} T
+ * @typedef {import("./type").StaticObject<T>} StaticObject
+ */
+/**
+ * @template {object} T
+ * @template {string} S
+ * @typedef {import("./type").ExcludeStartsWith<T, S>} ExcludeStartsWith
+ */
+
+/**
  * @overload
  * @param {string} key
  * @returns {any}
  */
+
 /**
  * @template {object | any[]} T
  * @overload
  * @param {string} key
- * @param {T} defaultValue
+ * @param {StaticObject<T>} defaultValue
+ * @param {(data: StaticObject<T>) => T} [transform]
  * @returns {T}
  */
 /**
  * @template {object | any[]} T
  * @param {string} key
- * @param {T} [defaultValue]
+ * @param {T | StaticObject<T>} [defs]
+ * @param {(data: StaticObject<T>) => T} [transform]
  * @returns {T | undefined}
  */
-export function getValue(key, defaultValue = undefined) {
+export function getValue(key, defs, transform = (x) => /** @type {T} */ (x)) {
 	const data = localStorage.getItem(key);
 	let obj = null;
 
 	try {
-		obj = JSON.parse(data || "null") || defaultValue;
+		obj = JSON.parse(data || "null") || defs;
 	} catch (error) {
 		console.error(error);
-		obj = defaultValue;
+		obj = defs;
 	}
 
 	const proxyMap = new WeakMap();
+	if (transform) obj = transform(obj);
 
 	const createRecursiveProxy = (target) => {
 		if (typeof target !== "object" || target === null) return target;

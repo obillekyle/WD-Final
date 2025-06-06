@@ -79,7 +79,7 @@ export const NAME = Object.freeze({
 	/** Juan Antonio Dela Cruz */
 	FULLNAME: 2,
 	/** Dela Cruz, Juan A. */
-	SURNAME_FIRST: 3,
+	SURNAME: 3,
 	/** Dela Cruz, Juan Antonio */
 	SURNAME_FULL: 4,
 	/** Dr. Juan Antonio Dela Cruz */

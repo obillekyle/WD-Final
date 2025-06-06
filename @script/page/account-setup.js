@@ -1,16 +1,13 @@
 import { createIcon } from "/@components/!util.js";
-import { profiles } from "../data.js";
-import { getUser } from "../login.js";
+import { Avatars, Session } from "../blueprint.js";
 import { q$ } from "../utils.js";
 
 export function update() {
-	const user = getUser();
+	const user = Session.currentUser;
 	const accountIcon = q$(".account");
-	if (user && accountIcon) {
-		const image = profiles[user.id];
 
-		if (image) accountIcon.style.backgroundImage = `url(${image})`;
-		else accountIcon.textContent = user.fname[0].toUpperCase();
+	if (user && accountIcon) {
+		accountIcon.style.backgroundImage = `url(${Avatars.get(user._id)})`;
 
 		accountIcon.append(
 			createIcon("material-symbols:settings-outline", ["cog"]),

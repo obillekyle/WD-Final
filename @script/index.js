@@ -2,6 +2,8 @@ import "./functions.js";
 import "/@components/index.js";
 
 import { WNavigation } from "/@components/navigation.js";
+import { Session } from "./blueprint.js";
+import { ROLES } from "./enums.js";
 import { ripple } from "./events/ripple.js";
 import { bindAttrs, newElement, q$ } from "./utils.js";
 
@@ -25,56 +27,74 @@ window.onpointerdown = (event) => {
  * @prop {boolean} [mobile]
  */
 
+const user = Session.currentUser;
+
 /** @type {NavItem[]} */
-const navItems = [
-	{
-		icon: "material-symbols:home-outline",
-		href: "/dashboard.html",
-		match: "/dashboard",
-		text: "Home",
-	},
-	{
-		icon: "material-symbols:id-card-outline",
-		href: "/data.html",
-		match: "/(data|section|subject|faculty|room)",
-		text: "Data",
-		mobile: true,
-	},
-	{
-		icon: "mdi:teach",
-		href: "/faculty/index.html",
-		match: "/faculty",
-		text: "Faculty",
-		desktop: true,
-	},
-	{
-		icon: "material-symbols:book-ribbon-outline",
-		href: "/subject/index.html",
-		match: "/subject",
-		text: "Subjects",
-		desktop: true,
-	},
-	{
-		icon: "material-symbols:group-outline",
-		href: "/section/index.html",
-		match: "/section",
-		text: "Sections",
-		desktop: true,
-	},
-	{
-		icon: "material-symbols:meeting-room-outline",
-		href: "/room/index.html",
-		match: "/room",
-		text: "Rooms",
-		desktop: true,
-	},
-	{
-		icon: "material-symbols:calendar-month-outline",
-		href: "/schedule/index.html",
-		match: "/schedule",
-		text: "Schedule",
-	},
-];
+const navItems =
+	user?.role === ROLES.ADMIN
+		? [
+				{
+					icon: "material-symbols:home-outline",
+					href: "/dashboard.html",
+					match: "/dashboard",
+					text: "Home",
+				},
+				{
+					icon: "material-symbols:calendar-month-outline",
+					href: "/schedule/index.html",
+					match: "/schedule",
+					text: "Schedule",
+				},
+			]
+		: [
+				{
+					icon: "material-symbols:home-outline",
+					href: "/dashboard.html",
+					match: "/dashboard",
+					text: "Home",
+				},
+				{
+					icon: "material-symbols:id-card-outline",
+					href: "/data.html",
+					match: "/(data|section|subject|faculty|room)",
+					text: "Data",
+					mobile: true,
+				},
+				{
+					icon: "mdi:teach",
+					href: "/faculty/index.html",
+					match: "/faculty",
+					text: "Faculty",
+					desktop: true,
+				},
+				{
+					icon: "material-symbols:book-ribbon-outline",
+					href: "/subject/index.html",
+					match: "/subject",
+					text: "Subjects",
+					desktop: true,
+				},
+				{
+					icon: "material-symbols:group-outline",
+					href: "/section/index.html",
+					match: "/section",
+					text: "Sections",
+					desktop: true,
+				},
+				{
+					icon: "material-symbols:meeting-room-outline",
+					href: "/room/index.html",
+					match: "/room",
+					text: "Rooms",
+					desktop: true,
+				},
+				{
+					icon: "material-symbols:calendar-month-outline",
+					href: "/schedule/index.html",
+					match: "/schedule",
+					text: "Schedule",
+				},
+			];
 
 function navigationFactory() {
 	const nav = q$("w-navigation", null, WNavigation);
@@ -92,7 +112,6 @@ function navigationFactory() {
 	});
 
 	const account = newElement("div", { class: "account" });
-
 	bindAttrs(nav, { replace: [appLogo, navList, account] });
 }
 

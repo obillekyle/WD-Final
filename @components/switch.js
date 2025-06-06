@@ -1,13 +1,11 @@
-import { newElement } from '/@script/utils.js';
-
+import { bindAttrs, newElement } from "/@script/utils.js";
+import { Setup } from "./!mixins.js";
 import { createIcon, getInputAttributes, takeAttribute } from "./!util.js";
 
-export class WSwitch extends HTMLElement {
-	input;
+export class WSwitch extends Setup {
+	input = newElement("input", {}, HTMLInputElement);
 
-	connectedCallback() {
-		this.innerHTML = "";
-
+	setup() {
 		const indicator = newElement("div", ["thumb"]);
 		const iconActive = createIcon(takeAttribute(this, "icon-active"), [
 			"checked",
@@ -18,14 +16,22 @@ export class WSwitch extends HTMLElement {
 			"noobserver",
 		]);
 
-		this.input = newElement("input", {
+		this.input = bindAttrs(this.input, {
 			...getInputAttributes(this),
 			type: "checkbox",
 		});
 
 		indicator.append(iconInactive, iconActive);
-		this.append(this.input, indicator);
+		this.replaceChildren(this.input, indicator);
 		this.addEventListener("click", () => this.input.click());
+	}
+
+	get checked() {
+		return this.input.checked;
+	}
+
+	set checked(value) {
+		this.input.checked = Boolean(value);
 	}
 }
 

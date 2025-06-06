@@ -70,7 +70,7 @@ w-switch {
   input {
     position: absolute;
     pointer-events: none;
-    opacity: 0;
+    opacity: 0 !important;
   }
 
   &:has(input:checked) {

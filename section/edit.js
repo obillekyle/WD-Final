@@ -2,18 +2,16 @@ import { openDialog } from "/@components/dialog.js";
 import { WInput } from "/@components/input.js";
 import { WDropdown } from "/@components/select.js";
 import { WTable } from "/@components/table.js";
-import { programs, subjects } from "/@script/data.js";
+import { Program, Section } from "/@script/blueprint.js";
 import { assert, debounce, newElement, q$ } from "/@script/utils.js";
 import "/@script/page/account-setup.js";
 
 const params = new URLSearchParams(window.location.search);
-const ids = JSON.parse(params.get("ids") || "");
+const ids = JSON.parse(params.get("ids") || "[]");
 
-/** @type {Record<string, import('@script/data').Subject>} */
+/** @type {Record<string, Section>} */
 const inputs = Object.fromEntries(
-	ids
-		.map((id) => [id.toLowerCase(), { ...subjects[id.toLowerCase()] }])
-		.filter(([id]) => id in subjects),
+	ids.map((id) => [id, Section.get(id)]).filter(([id]) => id in Section.data),
 );
 
 if (!ids.length || !Object.keys(inputs).length) {
@@ -25,7 +23,7 @@ if (!ids.length || !Object.keys(inputs).length) {
 			newElement("w-button", {
 				text: "Close",
 				type: "close",
-				href: "../subjects.html",
+				href: "./index.html",
 			}),
 		],
 	});
@@ -34,7 +32,7 @@ if (!ids.length || !Object.keys(inputs).length) {
 const saveBtn = q$("#save");
 const inputsContainer = q$("#inputs");
 const table = q$("w-table", null, WTable);
-const dropdownItems = Object.entries(programs).map(([id, data]) => ({
+const dropdownItems = Object.entries(Program.data).map(([id, data]) => ({
 	value: id,
 	label: data.name,
 }));
@@ -47,27 +45,29 @@ assert(table, "Table not found");
 
 table.page = 1;
 table.columns = {
-	title: "Subject Name",
-	id: "Subject Code",
+	name: "Name",
 	program: "Program",
-	units: "Credit Units",
+	year: "Year",
+	section: "Section",
 };
 
-table.data = Object.entries(inputs).map(([id, data]) => ({
-	id: id.toUpperCase(),
-	title: data.title,
-	program: data.program,
-	units: data.units,
-}));
+const yearItems = [
+	{ value: "1", label: "First Year" },
+	{ value: "2", label: "Second Year" },
+	{ value: "3", label: "Third Year" },
+	{ value: "4", label: "Fourth Year" },
+];
 
 function renderTable() {
 	assert(table, "Table not found");
 	table.data = Object.entries(inputs).map(([id, data]) => ({
-		id: id.toUpperCase(),
-		title: data.title,
+		id,
+		name: data._name,
 		program: data.program,
-		units: data.units,
+		year: data.year,
+		section: data.section,
 	}));
+
 	table.refresh();
 }
 
@@ -85,65 +85,56 @@ function renderInputs() {
 	inputsContainer.innerHTML = "";
 
 	Object.entries(inputs).forEach(([index, input]) => {
-		const { program, title, units } = input;
+		const { program, section, year } = input;
 
 		const form = newElement("form", { id: `form-${index}` });
 		const divider = newElement("w-input-divider", {
-			text: `Subject ${index.toUpperCase()}`,
+			text: `Section ${index.toUpperCase()}`,
 		});
 
-		const programs = newElement(
-			"w-dropdown",
-			{
-				name: "program",
-				label: "Program",
-				icon: "mingcute:department-line",
-				required: true,
-				placeholder: "Select Program",
-				value: program,
-			},
-			WDropdown,
-		);
+		const programs = newElement("w-dropdown", {
+			$: WDropdown,
+			name: "program",
+			label: "Program",
+			icon: "mingcute:department-line",
+			required: true,
+			value: program,
+		});
 
+		const yearInput = newElement("w-dropdown", {
+			$: WDropdown,
+			name: "program",
+			label: "Year",
+			icon: "mdi:graduation-cap-outline",
+			required: true,
+			value: year,
+		});
+
+		yearInput.options = yearItems;
 		programs.options = dropdownItems;
+
 		programs.onchange = () => {
 			input.program = programs.value;
 		};
 
-		const unitsInput = newElement(
-			"w-input",
-			{
-				label: "Units",
-				type: "number",
-				icon: "material-symbols:star-outline",
-				name: "units",
-				required: true,
-				min: 1,
-				max: 3,
-				value: units,
-				onchange: () => {
-					input.units = Number(unitsInput.value || 0);
-				},
-			},
-			WInput,
-		);
+		yearInput.onchange = () => {
+			input.year = Number(yearInput.value);
+		};
 
-		const titleInput = newElement(
-			"w-input",
-			{
-				label: "Program Title",
-				icon: "mdi:card-text-outline",
-				name: "title",
-				required: true,
-				value: title,
-				onchange: () => {
-					input.title = titleInput.value;
-				},
+		const sectionInput = newElement("w-input", {
+			$: WInput,
+			name: "section",
+			icon: "material-symbols:star-outline",
+			required: true,
+			label: "Section",
+			placeholder: "A",
+			value: section,
+			onchange: () => {
+				input.section = sectionInput.value;
 			},
-			WInput,
-		);
+		});
 
-		form.append(divider, titleInput, programs, unitsInput);
+		form.append(divider, programs, yearInput, sectionInput);
 		inputsContainer.append(form);
 	});
 	renderTable();
@@ -165,23 +156,19 @@ function saveChanges() {
 
 	if (valid) {
 		for (const [index, input] of Object.entries(inputs)) {
-			subjects[index.toLowerCase()] = {
-				title: input.title,
-				program: input.program,
-				units: input.units,
-			};
+			Section.data[index] = input;
 		}
 
 		openDialog({
 			icon: "material-symbols:info-outline",
 			title: "Success",
-			content: "Subjects edited successfully.",
+			content: "Sections edited successfully.",
 			actions: [
 				newElement("w-button", {
 					text: "Close",
 					type: "close",
 					variant: "outlined",
-					onclick: "../subject.html",
+					onclick: "./index.html",
 				}),
 			],
 		});

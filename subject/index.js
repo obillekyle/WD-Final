@@ -1,14 +1,8 @@
-import { WTable } from "/@components/table.js";
-import { subjects } from "../@script/data.js";
-import { isLoggedIn } from "../@script/login.js";
-import { assert, debounce, expose, newElement, q$ } from "../@script/utils.js";
-
-import "/@script/page/account-setup.js";
 import { openDialog } from "/@components/dialog.js";
-
-if (!isLoggedIn) {
-	window.location.href = `./index.html?redirect=${btoa(window.location.href)}`;
-}
+import { WTable } from "/@components/table.js";
+import { Subject } from "/@script/blueprint.js";
+import { assert, debounce, expose, newElement, q$ } from "../@script/utils.js";
+import "/@script/page/account-setup.js";
 
 const table = q$("w-table", null, WTable);
 assert(table, "Table not found");
@@ -22,7 +16,7 @@ table.columns = {
 };
 
 function getTableData() {
-	return Object.entries(subjects).map(([id, data]) => ({
+	return Object.entries(Subject.data).map(([id, data]) => ({
 		id: id.toUpperCase(),
 		name: data.title,
 		program: data.program,
@@ -64,7 +58,7 @@ deleteIcon?.addEventListener("click", () => {
 				type: "close",
 				onclick: () => {
 					for (const id of table.selected) {
-						delete subjects[id];
+						delete Subject.data[id];
 					}
 					table.data = getTableData();
 					table.refresh();

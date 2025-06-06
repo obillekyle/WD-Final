@@ -1,14 +1,9 @@
+import { openDialog } from "/@components/dialog.js";
 import { WTable } from "/@components/table.js";
-import { getRoomName, rooms } from "/@script/data.js";
-import { isLoggedIn } from "/@script/login.js";
 import { assert, debounce, expose, newElement, q$ } from "../@script/utils.js";
 
 import "/@script/page/account-setup.js";
-import { openDialog } from "/@components/dialog.js";
-
-if (!isLoggedIn) {
-	location.href = `./index.html?redirect=${btoa(location.href)}`;
-}
+import { Room } from "/@script/blueprint.js";
 
 const table = q$("w-table", null, WTable);
 assert(table, "Table not found");
@@ -21,18 +16,11 @@ table.columns = {
 	available: "Availability",
 };
 
-function getRoomType(type) {
-	if (type === "regular") return "Regular";
-	if (type === "comlab") return "ComLab";
-	if (type === "hrslab") return "HRS Lab";
-	return "Unknown";
-}
-
 function getTableData() {
-	return Object.entries(rooms).map(([id, data]) => ({
+	return Object.entries(Room.data).map(([id, data]) => ({
 		id,
-		name: getRoomName(id),
-		type: getRoomType(data.type),
+		name: data.name,
+		type: data.type,
 		available: data.available ? "Available" : "Unavailable",
 	}));
 }
@@ -70,7 +58,7 @@ deleteIcon?.addEventListener("click", () => {
 				class: "error",
 				onclick: (event) => {
 					for (const id of table.selected) {
-						delete rooms[id];
+						delete Room.data[id];
 					}
 					table.data = getTableData();
 					table.refresh();
@@ -87,7 +75,7 @@ table.onchange = () => {
 };
 
 editIcon?.addEventListener("click", () => {
-	location.href = `./edit.html?id=${JSON.stringify(table.selected)}`;
+	location.href = `./edit.html?ids=${JSON.stringify(table.selected)}`;
 });
 
 expose("search", onSearch);

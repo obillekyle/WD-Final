@@ -1,7 +1,7 @@
 import { openDialog } from "/@components/dialog.js";
 import { WTable } from "/@components/table.js";
-import { faculties, getFacultyName } from "/@script/data.js";
-import { SHIFTS, STATUS } from "/@script/enums.js";
+import { Faculty } from "/@script/blueprint.js";
+import { NAME, SHIFTS, STATUS } from "/@script/enums.js";
 import {
 	assert,
 	debounce,
@@ -25,9 +25,9 @@ table.columns = {
 };
 
 function getTableData() {
-	return Object.entries(faculties).map(([id, data]) => ({
+	return Object.entries(Faculty.data).map(([id, data]) => ({
 		id,
-		name: getFacultyName(id),
+		name: data.formatName(NAME.WITH_INITIAL),
 		email: data.email,
 		department: data.department,
 		shift: switchCase(data.shift, [
@@ -77,7 +77,7 @@ deleteIcon?.addEventListener("click", () => {
 				type: "close",
 				onclick: () => {
 					for (const id of table.selected) {
-						delete faculties[id];
+						delete Faculty.data[id];
 					}
 					table.data = getTableData();
 					table.refresh();

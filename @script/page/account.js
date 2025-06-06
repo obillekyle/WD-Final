@@ -1,8 +1,8 @@
 import { createIcon } from "/@components/!util.js";
 import { openDialog } from "/@components/dialog.js";
-import { accounts, getUserFullname, getUserImage, profiles } from "../data.js";
+import { Account, Avatars, Session } from "../blueprint.js";
+import { accounts, profiles } from "../data.js";
 import { NAME, ROLES } from "../enums.js";
-import { getUser, logout } from "../login.js";
 import {
 	as,
 	expose,
@@ -19,10 +19,10 @@ const account = q$("#account-info");
 
 function updateProfile() {
 	if (profile && account) {
-		const user = getUser();
+		const user = Session.currentUser;
 
 		if (user) {
-			profile.style.backgroundImage = `url(${getUserImage(user.id)})`;
+			profile.style.backgroundImage = `url(${Avatars.get(user._id)})`;
 			profile.addEventListener("click", () => handleUpload(user));
 
 			account.innerHTML = "";
@@ -30,7 +30,7 @@ function updateProfile() {
 			account.append(
 				newElement("div", {
 					name: "",
-					text: getUserFullname(user.id, NAME.FULLNAME),
+					text: user.formatName(NAME.WITH_TITLE),
 					append: [
 						createIcon("material-symbols:drive-file-rename-outline-outline", {
 							edit: "",
@@ -55,10 +55,11 @@ function updateProfile() {
 }
 
 expose("logout", () => {
-	logout();
-	window.location.href = "./index.html";
+	Session.logout();
+	location.href = "./index.html";
 });
 
+/** @param {Account} user */
 async function handleUpload(user) {
 	const file = await openFilePicker("image/*");
 
@@ -98,7 +99,7 @@ async function handleUpload(user) {
 	}
 
 	profile?.style.setProperty("background-image", `url(${imgString})`);
-	profiles[user.id] = imgString;
+	profiles[user._id] = imgString;
 	update();
 }
 
@@ -106,7 +107,7 @@ updateProfile();
 
 function submit(event) {
 	event.preventDefault();
-	const user = getUser();
+	const user = Session.currentUser;
 
 	if (!user) {
 		openDialog({
@@ -130,7 +131,7 @@ function submit(event) {
 	const data = new FormData(form);
 	const values = Object.fromEntries(data.entries());
 
-	accounts[user.id] = Object.assign(accounts[user.id], values);
+	accounts[user._id] = Object.assign(user, values);
 
 	updateProfile();
 
@@ -158,7 +159,7 @@ function submit(event) {
 }
 
 function openDetailEditor() {
-	const user = getUser();
+	const user = Session.currentUser;
 
 	if (!user) return;
 

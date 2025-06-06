@@ -1,28 +1,23 @@
 import { WDropdown } from "/@components/select.js";
-import { timeRows } from "/@script/constants.js";
+import { days, timeRows } from "/@script/constants.js";
+import { NAME, WEEKDAYS } from "/@script/enums.js";
 import {
-	checkScheduleConflicts,
-	faculties,
-	getFacultyName,
-	getRoomName,
-	getSectionName,
-	getSubjectName,
-	rooms,
-	schedules,
-	sections,
-	subjects,
-} from "/@script/data.js";
-import { WEEKDAYS } from "/@script/enums.js";
-import {
+	assert,
 	bindAttrs,
 	newElement,
 	q$,
 	qAll$,
 	replaceElement,
-	switchCase,
 } from "/@script/utils.js";
 import "/@script/page/account-setup.js";
 import { openDialog } from "/@components/dialog.js";
+import {
+	Faculty,
+	Room,
+	Schedule,
+	Section,
+	Subject,
+} from "/@script/blueprint.js";
 
 const TYPE = Object.freeze({
 	ROOM: "room",
@@ -39,81 +34,55 @@ let id = params.get("id") || "";
 const colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
 
 // load dropdowns
-const facultyInput = /** @type {WDropdown} */ (q$("#facultyInput"));
+const facultyInput = q$("#facultyInput", null, WDropdown);
+const roomInput = q$("#roomInput", null, WDropdown);
+const subjectInput = q$("#subjectInput", null, WDropdown);
+const sectionInput = q$("#sectionInput", null, WDropdown);
+const dayInput = q$("#dayInput", null, WDropdown);
+const startInput = q$("#startInput", null, WDropdown);
+const endInput = q$("#endInput", null, WDropdown);
 
-for (const id in faculties) {
-	facultyInput?.append(
-		newElement("w-option", {
-			value: id,
-			text: getFacultyName(id),
-		}),
-	);
+assert(
+	facultyInput &&
+		roomInput &&
+		subjectInput &&
+		sectionInput &&
+		dayInput &&
+		startInput &&
+		endInput,
+	"Dropdown not found",
+);
+
+/**
+ * @template T
+ * @template {keyof T} K
+ * @param {Record<string, T>} data
+ * @param {K} key
+ * @param {T[K] extends (...args: infer U) => any ? U : never} [args]
+ */
+function mapper(data, key, args = /** @type {any} */ ([])) {
+	return Object.entries(data).map(([id, value]) => ({
+		value: id,
+		label: typeof value[key] === "function" ? value[key](...args) : value[key],
+	}));
 }
 
-const roomInput = /** @type {WDropdown} */ (q$("#roomInput"));
+facultyInput.options = mapper(Faculty.data, "formatName", [NAME.FULLNAME]);
+roomInput.options = mapper(Room.data, "name");
+subjectInput.options = mapper(Subject.data, "title");
+sectionInput.options = mapper(Section.data, "_name");
+dayInput.options = Object.entries(WEEKDAYS).map(([id, value]) => ({
+	value: String(value),
+	label: id[0].toUpperCase() + id.slice(1).toLowerCase(),
+}));
 
-for (const id in rooms) {
-	roomInput?.append(
-		newElement("w-option", {
-			value: id,
-		}),
-	);
-}
+const timeOptions = Object.entries(timeRows).map(([id, value]) => ({
+	value: id,
+	label: value,
+}));
 
-const subjectInput = /** @type {WDropdown} */ (q$("#subjectInput"));
-
-for (const [id, subject] of Object.entries(subjects)) {
-	subjectInput?.append(
-		newElement("w-option", {
-			value: id,
-			text: subject.title,
-		}),
-	);
-}
-
-const sectionInput = /** @type {WDropdown} */ (q$("#sectionInput"));
-
-for (const id of Object.keys(sections)) {
-	sectionInput?.append(
-		newElement("w-option", {
-			value: id,
-			text: getSectionName(id),
-		}),
-	);
-}
-
-const dayInput = /** @type {WDropdown} */ (q$("#dayInput"));
-
-for (const [text, value] of Object.entries(WEEKDAYS)) {
-	dayInput?.append(
-		newElement("w-option", {
-			value,
-			text,
-		}),
-	);
-}
-
-const startInput = /** @type {WDropdown} */ (q$("#startInput"));
-
-for (let i = 0; i < timeRows.length; i++) {
-	startInput?.append(
-		newElement("w-option", {
-			value: i,
-			text: timeRows[i],
-		}),
-	);
-}
-
-const endInput = /** @type {WDropdown} */ (q$("#endInput"));
-
-for (let i = 0; i < timeRows.length; i++) {
-	endInput?.append(
-		newElement("w-option", {
-			value: i,
-			text: timeRows[i],
-		}),
-	);
-}
+startInput.options = timeOptions;
+endInput.options = timeOptions;
 
 // load clickable chip & update table
 updateChips();
@@ -169,21 +138,19 @@ function updateChips() {
 				if (box) {
 					dropdown = replaceElement(
 						box,
-						/** @type {WDropdown} */ (
-							newElement("w-dropdown", {
-								id: "scheduleInput",
-								label: "Rooms",
-								icon: "material-symbols:meeting-room-outline",
-								append: Object.entries(rooms).map(([key, room]) => {
-									return newElement("w-option", {
-										value: key,
-										text: room.name,
-										checked: key === id,
-									});
-								}),
-							})
-						),
+						newElement("w-dropdown", {
+							$: WDropdown,
+							id: "scheduleInput",
+							label: "Rooms",
+							icon: "material-symbols:meeting-room-outline",
+						}),
 					);
+
+					dropdown.options = Object.entries(Room.data).map(([key, room]) => ({
+						value: key,
+						label: room.name,
+						checked: key === id,
+					}));
 				}
 			}
 			break;
@@ -194,20 +161,20 @@ function updateChips() {
 				if (box) {
 					dropdown = replaceElement(
 						box,
-						/** @type {WDropdown} */ (
-							newElement("w-dropdown", {
-								id: "scheduleInput",
-								label: "Faculties",
-								icon: "material-symbols:group-outline",
-								append: Object.keys(faculties).map((key) => {
-									return newElement("w-option", {
-										value: key,
-										text: getFacultyName(key),
-										checked: key === id,
-									});
-								}),
-							})
-						),
+						newElement("w-dropdown", {
+							$: WDropdown,
+							id: "scheduleInput",
+							label: "Faculties",
+							icon: "material-symbols:group-outline",
+						}),
+					);
+
+					dropdown.options = Object.entries(Faculty.data).map(
+						([key, faculty]) => ({
+							value: key,
+							label: faculty.formatName(NAME.FULLNAME),
+							checked: key === id,
+						}),
 					);
 				}
 			}
@@ -219,30 +186,34 @@ function updateChips() {
 				if (box) {
 					dropdown = replaceElement(
 						box,
-						/** @type {WDropdown} */ (
-							newElement("w-dropdown", {
-								id: "scheduleInput",
-								label: "Sections",
-								icon: "material-symbols:group-outline",
-								append: Object.keys(sections).map((key) => {
-									return newElement("w-option", {
-										value: key,
-										text: getSectionName(key),
-										checked: key === id,
-									});
-								}),
-							})
-						),
+						newElement("w-dropdown", {
+							$: WDropdown,
+							id: "scheduleInput",
+							label: "Sections",
+							icon: "material-symbols:group-outline",
+						}),
+					);
+
+					dropdown.options = Object.entries(Section.data).map(
+						([key, section]) => ({
+							value: key,
+							label: section._name,
+							checked: key === id,
+						}),
 					);
 				}
 			}
 			break;
 	}
 
-	dropdown?.addEventListener("change", () => {
-		id = dropdown?.value || "";
-		updateTable();
-	});
+	if (dropdown) {
+		dropdown.onchange = () => {
+			id = dropdown?.value || "";
+			updateTable();
+		};
+
+		dropdown.value = id;
+	}
 
 	updateTable();
 }
@@ -292,7 +263,7 @@ function updateRoomTable(id) {
 	resetTable();
 
 	const table = q$(".sched-table tbody");
-	const roomData = schedules[id];
+	const roomData = Schedule.onRoom(id);
 
 	if (!table || !roomData) return;
 
@@ -308,13 +279,15 @@ function updateRoomTable(id) {
 				bindAttrs(cell, {
 					append: [
 						newElement("div", { text: entry.subject.toUpperCase() }),
-						newElement("div", { text: getFacultyName(entry.instructor) }),
-						newElement("div", { text: getSectionName(entry.section) }),
+						newElement("div", {
+							text: Faculty.get(entry.faculty).formatName(),
+						}),
+						newElement("div", { text: Section.get(entry.section)._name }),
 					],
 				});
 
+				cell.setAttribute("schedule", entry._id);
 				cell.setAttribute("rowspan", String(entry.end - entry.start));
-				cell.setAttribute("data", JSON.stringify({ ...entry, room: id }));
 				cell.classList.add(colors[Number(key) % colors.length]);
 				continue;
 			}
@@ -328,11 +301,7 @@ function updateFacultyTable(id) {
 	resetTable();
 
 	const table = q$(".sched-table tbody");
-	const facultyData = Object.entries(schedules).flatMap(([room, data]) =>
-		data
-			.filter((entry) => entry.instructor === Number(id))
-			.map((entry) => ({ room, ...entry })),
-	);
+	const facultyData = Schedule.for(id);
 
 	if (!table) return;
 
@@ -348,13 +317,15 @@ function updateFacultyTable(id) {
 				bindAttrs(cell, {
 					append: [
 						newElement("div", { text: entry.subject.toUpperCase() }),
-						newElement("div", { text: getRoomName(entry.room) }),
-						newElement("div", { text: getSectionName(entry.section) }),
+						newElement("div", { text: Room.get(entry.room).name }),
+						newElement("div", { text: Section.get(entry.section)._name }),
 					],
 				});
 
+				console.log(entry);
+
+				cell.setAttribute("schedule", entry._id);
 				cell.setAttribute("rowspan", String(entry.end - entry.start));
-				cell.setAttribute("data", JSON.stringify(entry));
 				cell.classList.add(colors[Number(key) % colors.length]);
 				continue;
 			}
@@ -368,11 +339,7 @@ function updateSectionTable(id) {
 	resetTable();
 
 	const table = q$(".sched-table tbody");
-	const sectionData = Object.entries(schedules).flatMap(([room, data]) =>
-		data
-			.filter((entry) => entry.section === Number(id))
-			.map((entry) => ({ room, ...entry })),
-	);
+	const sectionData = Schedule.onSection(id);
 
 	if (!table) return;
 
@@ -388,13 +355,15 @@ function updateSectionTable(id) {
 				bindAttrs(cell, {
 					append: [
 						newElement("div", { text: entry.subject.toUpperCase() }),
-						newElement("div", { text: getRoomName(entry.room) }),
-						newElement("div", { text: getFacultyName(entry.instructor) }),
+						newElement("div", { text: Room.get(entry.room).name }),
+						newElement("div", {
+							text: Faculty.get(entry.faculty).formatName(),
+						}),
 					],
 				});
 
+				cell.setAttribute("schedule", entry._id);
 				cell.setAttribute("rowspan", String(entry.end - entry.start));
-				cell.setAttribute("data", JSON.stringify(entry));
 				cell.classList.add(colors[Number(key) % colors.length]);
 				continue;
 			}
@@ -404,7 +373,6 @@ function updateSectionTable(id) {
 	}
 }
 
-let size = 0;
 let column = 0;
 let cellStart = -1;
 let cellEnd = -1;
@@ -427,29 +395,30 @@ document.addEventListener("pointerdown", (event) => {
 	const target = /** @type {HTMLElement} */ (event.target);
 
 	if (startClick + 200 > Date.now()) {
-		if (target.hasAttribute("data")) {
-			const data = JSON.parse(target.getAttribute("data") || "{}");
-			editData(data);
+		if (target.hasAttribute("schedule") || target.matches(".selected")) {
+			editData(
+				Schedule.get(target.getAttribute("schedule") || "") ||
+					new Schedule(
+						/** @type {any} */ ({
+							day: column,
+							start: cellStart,
+							end: cellEnd + 1,
+							...getFocusValue(),
+						}),
+					),
+			);
 			return;
 		}
-		if (target.matches(".selected")) {
-			editData({
-				day: column,
-				start: cellStart,
-				end: cellEnd + 1,
-				...getFocusValue(),
-			});
-			return;
-		}
+
 		dragging = true;
 	} else {
 		startClick = Date.now();
 		return false;
 	}
 
-	if (target.tagName !== "TD" || target.matches(".time")) return;
+	if (target.tagName !== "TD" || target.matches(".time")) {
+	}
 
-	size = Number(target.getAttribute("rowspan"));
 	column = Number(target.getAttribute("data-column"));
 	cellStart = Number(target.getAttribute("data-row"));
 	cellEnd = cellStart;
@@ -466,18 +435,13 @@ document.addEventListener("pointermove", (event) => {
 
 	const newColumn = Number(target.getAttribute("data-column"));
 	const newRow = Number(target.getAttribute("data-row"));
-	const rowSize = Number(target.getAttribute("rowspan") || 1);
 
-	if (rowSize > 1) {
-		size = rowSize;
-		column = newColumn;
-		cellStart = newRow;
-		cellEnd = cellStart + rowSize - 1;
+	if (cellStart > newRow) {
+		return;
 	} else if (newColumn !== column) {
 		column = newColumn;
 		cellStart = newRow;
 		cellEnd = cellStart;
-		size = rowSize;
 	} else if (cellStart + 6 > newRow) {
 		cellEnd = newRow;
 	}
@@ -494,35 +458,51 @@ function highlightCells() {
 	const old = qAll$(".sched-table td.selected");
 
 	for (const cell of old) {
-		cell.classList.remove("selected");
+		cell.classList.remove("selected", "start", "end");
 	}
 
 	for (let i = cellStart; i <= cellEnd; i++) {
 		const cell = q$(`td[data-column="${column}"][data-row="${i}"]`);
 
 		if (!cell) continue;
+		cell.classList.toggle("start", i === cellStart);
+		cell.classList.toggle("end", i === cellEnd);
 		cell.classList.add("selected");
 	}
 }
 
-function editData(data) {
-	const sidebar = /** @type {HTMLFormElement} */ (q$(".sidebar"));
+/** @param { Schedule} schedule */
+function editData(schedule) {
+	assert(
+		facultyInput &&
+			subjectInput &&
+			roomInput &&
+			sectionInput &&
+			startInput &&
+			endInput &&
+			dayInput,
+		"Missing inputs",
+	);
+
+	console.log(schedule);
+
+	const sidebar = q$(".sidebar", null, HTMLFormElement);
 
 	if (sidebar) {
 		sidebar.classList.add("open");
 
-		subjectInput.value = data.subject;
-		roomInput.value = data.room;
-		facultyInput.value = data.instructor;
-		sectionInput.value = data.section;
-		startInput.value = data.start;
-		endInput.value = data.end;
-		dayInput.value = data.day;
+		subjectInput.value = schedule.subject;
+		roomInput.value = schedule.room;
+		facultyInput.value = String(schedule.faculty);
+		sectionInput.value = String(schedule.section);
+		startInput.value = String(schedule.start === -1 ? "" : schedule.start);
+		endInput.value = String(schedule.end === -1 ? "" : schedule.end);
+		dayInput.value = String(schedule.day === -1 ? "" : schedule.day);
 
 		sidebar.onsubmit = (event) => {
 			event.preventDefault();
 			sidebar.requestSubmit();
-			editSchedule(data);
+			editSchedule(schedule);
 			return false;
 		};
 
@@ -543,9 +523,7 @@ function editData(data) {
 						text: "Yes",
 						type: "close",
 						class: "error",
-						onclick: () => {
-							deleteSchedule(data.id || "");
-						},
+						onclick: () => deleteSchedule(id),
 					}),
 				],
 			});
@@ -553,18 +531,22 @@ function editData(data) {
 		};
 	}
 }
-/**
- *
- * @param {Partial<import('../@script/data.js').Schedule>} data
- */
+
+/** @param {Partial<Schedule>} data */
 function editSchedule(data) {
-	const instructor = facultyInput.value;
-	const room = roomInput.value;
-	const subject = subjectInput.value;
-	const section = sectionInput.value;
-	const day = dayInput.value;
-	const start = startInput.value;
-	const end = endInput.value;
+	assert(
+		facultyInput &&
+			subjectInput &&
+			roomInput &&
+			sectionInput &&
+			startInput &&
+			endInput &&
+			dayInput,
+		"Missing inputs",
+	);
+
+	const start = Number(startInput.value);
+	const end = Number(endInput.value);
 
 	if (start >= end) {
 		openDialog({
@@ -583,24 +565,23 @@ function editSchedule(data) {
 		return;
 	}
 
-	const newData = {
-		id:
-			Math.max(
-				...Object.entries(schedules).flatMap(([, schedules]) =>
-					schedules.map((s) => s.id),
-				),
-			) + 1,
-		...data,
-		instructor: Number(instructor),
-		room,
-		subject,
-		section: Number(section),
-		start: Number(start),
-		end: Number(end),
-		day: /** @type {typeof WEEKDAYS[keyof typeof WEEKDAYS]} */ (Number(day)),
-	};
+	const newData = new Schedule(
+		/** @type {any} */ ({
+			id: data._id || Schedule.nextId,
+			...data,
+			faculty: Number(facultyInput.value),
+			room: roomInput.value,
+			subject: subjectInput.value,
+			section: Number(sectionInput.value),
+			day: Number(dayInput.value),
+			start,
+			end,
+		}),
+	);
 
-	const conflicts = checkScheduleConflicts(newData);
+	console.log(newData);
+
+	const conflicts = Schedule.hasConflicts(newData);
 
 	if (conflicts.length) {
 		openDialog({
@@ -611,35 +592,26 @@ function editSchedule(data) {
 				newElement("p", {
 					append: [
 						newElement("b", { text: "Conflict with the following schedules:" }),
-						...conflicts.map((c) => newElement("p", { text: c.reasons })),
+						...conflicts.map((c) =>
+							newElement("p", { text: c.reasons.join(", ") }),
+						),
 					],
 				}),
 				newElement("p", {
 					append: [
 						newElement("b", { text: "Conflicting schedules:" }),
-						...conflicts.map(({ conflictingSchedule }) => {
-							const { subject, section, instructor, room, start, end, day } =
-								conflictingSchedule;
+						...conflicts.map((conflict) => {
+							const { subject, section, faculty, room } = conflict.with;
 
-							return newElement("p", {
+							return newElement("ul", {
+								class: "conflict",
 								append: [
-									newElement("div", { text: getSubjectName(subject) }),
-									newElement("div", { text: getSectionName(section) }),
-									newElement("div", { text: getFacultyName(instructor) }),
-									newElement("div", { text: getRoomName(room) }),
-									newElement("div", { text: timeRows[start] }),
-									newElement("div", { text: timeRows[end] }),
-									newElement("div", {
-										text: switchCase(day, [
-											[0, "Monday"],
-											[1, "Tuesday"],
-											[2, "Wednesday"],
-											[3, "Thursday"],
-											[4, "Friday"],
-											[5, "Saturday"],
-											[6, "Sunday"],
-										]),
-									}),
+									newElement("li", { text: Subject.get(subject).title }),
+									newElement("li", { text: Section.get(section)._name }),
+									newElement("li", { text: Faculty.getName(faculty) }),
+									newElement("li", { text: Room.get(room).name }),
+									newElement("li", { text: conflict.with._time }),
+									newElement("li", { text: conflict.with._day }),
 								],
 							});
 						}),
@@ -657,15 +629,7 @@ function editSchedule(data) {
 		return false;
 	}
 
-	schedules[newData.room] = schedules[newData.room] || [];
-
-	if (findSchedule(newData.id)) {
-		schedules[newData.room] = schedules[newData.room].filter(
-			(s) => String(s.id) !== String(newData.id),
-		);
-	}
-
-	schedules[newData.room].push(newData);
+	Schedule.data[newData._id] = newData;
 
 	updateTable();
 	q$(".sidebar")?.classList.remove("open");
@@ -690,22 +654,11 @@ function deleteSchedule(id) {
 		return;
 	}
 
-	for (const room in schedules) {
-		schedules[room] = schedules[room].filter(
-			(s) => String(s.id) !== String(id),
-		);
-	}
+	delete Schedule.data[id];
 
 	updateTable();
 	q$(".sidebar")?.classList.remove("open");
 }
-
-function findSchedule(id) {
-	return Object.values(schedules).flatMap((schedules) =>
-		schedules.find((schedule) => schedule.id === id),
-	)[0];
-}
-
 // @ts-ignore
 window.closeSidebar = (event) => {
 	if (event.currentTarget !== event.target) return;

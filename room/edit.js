@@ -1,8 +1,7 @@
-import WCheckbox from "/@components/checkbox.js";
 import { openDialog } from "/@components/dialog.js";
 import { WInput } from "/@components/input.js";
 import { WTable } from "/@components/table.js";
-import { rooms } from "/@script/data.js";
+import { Room } from "/@script/blueprint.js";
 import { ROOMTYPE } from "/@script/enums.js";
 import {
 	assert,
@@ -13,15 +12,20 @@ import {
 } from "/@script/utils.js";
 
 import "/@script/page/account-setup.js";
+import { WSwitch } from "/@components/switch.js";
 
 const params = new URLSearchParams(location.search);
-const ids = JSON.parse(params.get("ids") || "");
+const ids = JSON.parse(params.get("ids") || "[]");
 
-/** @type {Record<string, import('@script/data').Room>} */
+/** @type {Record<string, Room>} */
 const inputs = Object.fromEntries(
-	ids
-		.map((id) => [id.toLowerCase(), { ...rooms[id.toLowerCase()] }])
-		.filter(([id]) => id in rooms),
+	ids.map((id) => [id, { ...Room.get(id) }]).filter(([id]) => id in Room.data),
+);
+
+console.log(
+	inputs,
+	ids.map((id) => [id, { ...Room.get(id) }]),
+	ids.filter((id) => id in Room.data),
 );
 
 if (!ids.length || !Object.keys(inputs).length) {
@@ -60,15 +64,12 @@ function getData() {
 	return Object.entries(inputs).map(([id, data]) => ({
 		id: id.toUpperCase(),
 		name: data.name,
-		type: switchCase(
-			String(data.type),
-			[
-				[ROOMTYPE.COMLAB, "Computer Lab"],
-				[ROOMTYPE.HRSLAB, "HRS Lab"],
-				[ROOMTYPE.REGULAR, "Regular Room"],
-			],
-			"Unknown",
-		),
+		type: switchCase(String(data.type), [
+			[ROOMTYPE.COMLAB, "Computer Lab"],
+			[ROOMTYPE.HRSLAB, "HRS Lab"],
+			[ROOMTYPE.REGULAR, "Regular Room"],
+			[switchCase.DEFAULT, "Unknown"],
+		]),
 		available: data.available ? "Available" : "Unavailable",
 	}));
 }
@@ -114,8 +115,8 @@ function renderInputs() {
 			},
 		});
 
-		const checkbox = newElement("w-checkbox", {
-			$: WCheckbox,
+		const checkbox = newElement("w-switch", {
+			$: WSwitch,
 			name: "available",
 			checked: available,
 			onchange: () => {
@@ -124,7 +125,7 @@ function renderInputs() {
 		});
 
 		const availableInput = newElement("div", {
-			class: "flex gap-auto",
+			class: "flex gap-auto align-center",
 			append: ["Available", checkbox],
 		});
 
@@ -150,11 +151,12 @@ function saveChanges() {
 
 	if (valid) {
 		for (const [index, input] of Object.entries(inputs)) {
-			rooms[index] = {
+			Room.data[index] = new Room({
+				id: index,
 				name: input.name,
-				available: input.available,
 				type: input.type,
-			};
+				available: input.available,
+			});
 		}
 
 		openDialog({

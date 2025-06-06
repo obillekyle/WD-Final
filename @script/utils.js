@@ -555,16 +555,47 @@ export function assert(value, message = "Assertion failed") {
 /**
  * @template {string | number} T
  * @template K
+ *
+ * @overload
  * @param {T} value
- * @param {[T, K][]} cases
+ * @param {[(T), K][]} cases
+ * @param {K} [defaultValue]
+ * @returns {K | undefined}
+ */
+/**
+ * @template {string | number} T
+ * @template K
+ *
+ * @overload
+ * @param {T} value
+ * @param {[(T), K][]} cases
+ * @param {K} defaultValue
+ * @returns {K}
+ */
+/**
+ * @template {string | number} T
+ * @template K
+ *
+ * @overload
+ * @param {T} value
+ * @param {[(T | typeof switchCase.DEFAULT), K][]} cases
+ * @returns {K}
+ */
+
+/**
+ * @template {string | number} T
+ * @template K
+ * @param {T} value
+ * @param {[(T | typeof switchCase.DEFAULT), K][]} cases
  * @param {K} [defaultValue]
  * @returns {K | undefined}
  */
 export function switchCase(value, cases, defaultValue) {
 	for (const [v, k] of cases) if (v === value) return k;
-
-	return defaultValue;
+	return cases.find(([v]) => v === switchCase.DEFAULT)?.[1] || defaultValue;
 }
+
+switchCase.DEFAULT = Symbol();
 
 /**
  * @template {Element} E
@@ -574,4 +605,14 @@ export function switchCase(value, cases, defaultValue) {
  */
 export function as(value, _) {
 	return /** @type {any} */ (value);
+}
+
+export function svgToBase64(svg) {
+	const svgBytes = new TextEncoder().encode(svg);
+	let binary = "";
+	svgBytes.forEach((byte) => {
+		binary += String.fromCharCode(byte);
+	});
+
+	return btoa(binary);
 }

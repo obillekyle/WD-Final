@@ -64,7 +64,7 @@ w-input-pass {
   &:has(input:not(:placeholder-shown)),
   &[forced-label] {
     [label] {
-      top: -10%;
+      top: -15%;
       left: calc(var(--xxs) / 2 * -1);
       transform: translateY(0);
 

@@ -4,7 +4,7 @@ w-dropdown,
 w-select {
   display: flex;
   flex-direction: column;
-  min-width: 200px;
+  min-width: 150px;
 
   position: relative;
 
@@ -82,7 +82,7 @@ w-select {
     /* Moves the label to the top */
     &:has([display]:not(:empty)) {
       [label] {
-        top: -10%;
+        top: -15%;
         left: calc(var(--xxs) / 2 * -1);
         transform: translateY(0);
 

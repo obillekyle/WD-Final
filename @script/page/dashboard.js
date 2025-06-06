@@ -1,20 +1,11 @@
+import { Room, Schedule, Section, Session } from "../blueprint.js";
 import { timeRows } from "../constants.js";
-import {
-	faculties,
-	getOngoingSchedule,
-	getRoomName,
-	getSectionName,
-	getUserFullname,
-	rooms,
-	sections,
-	subjects,
-} from "../data.js";
+import { faculties, rooms, sections, subjects } from "../data.js";
 import { NAME } from "../enums.js";
-import { getUser } from "../login.js";
 import { animateCounter, assert, newElement, q$ } from "../utils.js";
 import "/@script/page/account-setup.js";
 
-const user = getUser();
+const user = Session.currentUser;
 
 assert(user, "User must be logged in");
 
@@ -23,7 +14,7 @@ const tFaculty = q$("#total-faculty");
 const tSubjects = q$("#total-subjects");
 const tSections = q$("#total-sections");
 
-const schedulesNow = getOngoingSchedule();
+const schedulesNow = Schedule.ongoing;
 
 if (tRooms) animateCounter(tRooms, Object.keys(rooms).length);
 if (tFaculty) animateCounter(tFaculty, Object.keys(faculties).length);
@@ -37,7 +28,7 @@ const classSchedules = q$("#class-schedules");
 const occupiedRooms = q$("#occupied-rooms");
 const header = q$("w-header");
 
-if (header) header.textContent = getUserFullname(user.id, NAME.WITH_TITLE);
+if (header) header.textContent = user.formatName(NAME.FULLNAME);
 
 for (const { start, end, room, section } of schedulesNow) {
 	classSchedules?.append(
@@ -45,10 +36,10 @@ for (const { start, end, room, section } of schedulesNow) {
 			class: "flex gap-auto",
 			append: [
 				newElement("span", { text: `${timeRows[start]} - ${timeRows[end]}` }),
-				newElement("span", { text: getRoomName(room) }),
+				newElement("span", { text: Room.get(room).name }),
 			],
 			onclick: () => {
-				window.location.href = `./schedule.html?type=room&id=${room}`;
+				location.href = `./schedule.html?type=room&id=${room}`;
 			},
 		}),
 	);
@@ -57,11 +48,11 @@ for (const { start, end, room, section } of schedulesNow) {
 		newElement("div", {
 			class: "room ripple",
 			append: [
-				newElement("span", { text: getRoomName(room) }),
-				newElement("span", { text: getSectionName(section) }),
+				newElement("span", { text: Room.get(room).name }),
+				newElement("span", { text: Section.get(section)._name }),
 			],
 			onclick: () => {
-				window.location.href = `./schedule.html?type=room&id=${room}`;
+				location.href = `./schedule/index.html?type=room&id=${room}`;
 			},
 		}),
 	);

@@ -1,13 +1,7 @@
 import { WTable } from "/@components/table.js";
-import { getSectionName, sections } from "/@script/data.js";
-import { isLoggedIn } from "/@script/login.js";
+import { Section } from "/@script/blueprint.js";
 import { assert, debounce, expose, newElement, q$ } from "/@script/utils.js";
-
 import "/@script/page/account-setup.js";
-
-if (!isLoggedIn) {
-	window.location.href = `./index.html?redirect=${btoa(window.location.href)}`;
-}
 
 const table = q$("w-table", null, WTable);
 assert(table, "Table not found");
@@ -21,9 +15,9 @@ table.columns = {
 };
 
 function getTableData() {
-	return Object.entries(sections).map(([id, data]) => ({
+	return Object.entries(Section.data).map(([id, data]) => ({
 		id,
-		name: getSectionName(id),
+		name: data._name,
 		program: data.program,
 		year: data.year,
 		section: data.section,
@@ -67,7 +61,7 @@ deleteIcon?.addEventListener("click", () => {
 							class: "error",
 							onclick: (event) => {
 								for (const id of table.selected) {
-									delete sections[id];
+									delete Section.data[id];
 								}
 								table.data = getTableData();
 								table.refresh();

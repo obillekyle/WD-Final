@@ -10,9 +10,5 @@
   "hide-files.files": [
     "node_modules"
   ],
-  "editor.tokenColorCustomizations": {
-    "comments": "",
-    "textMateRules": []
-  },
   "typescript.experimental.useTsgo": false
 }

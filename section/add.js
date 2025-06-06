@@ -2,25 +2,17 @@ import { openDialog } from "/@components/dialog.js";
 import { WInput } from "/@components/input.js";
 import { WDropdown } from "/@components/select.js";
 import { WTable } from "/@components/table.js";
-import { programs, sections } from "../@script/data.js";
 import { assert, debounce, newElement, q$ } from "../@script/utils.js";
 
 import "/@script/page/account-setup.js";
+import { Program, Section } from "/@script/blueprint.js";
 
-/** @type {(import('../@script/data.js').Section)[]} */
-
-const inputs = [
-	{
-		program: "",
-		section: "",
-		year: 0,
-	},
-];
+const inputs = [new Section()];
 
 const saveBtn = q$("#save");
 const inputsContainer = q$("#inputs");
 const table = q$("w-table", null, WTable);
-const dropdownItems = Object.entries(programs).map(([id, data]) => ({
+const dropdownItems = Object.entries(Program.data).map(([id, data]) => ({
 	value: id,
 	label: data.name,
 }));
@@ -116,6 +108,7 @@ function renderInputs() {
 			$: WInput,
 			name: "section",
 			icon: "material-symbols:star-outline",
+			label: "Section",
 			required: true,
 			placeholder: "A",
 			value: section,
@@ -135,11 +128,7 @@ function renderInputs() {
 			class: "ml-auto",
 			variant: "outlined",
 			onclick: () => {
-				inputs.push({
-					program: "",
-					section: "",
-					year: 0,
-				});
+				inputs.push(new Section());
 				renderInputs();
 			},
 		}),
@@ -163,14 +152,10 @@ function saveChanges() {
 	}
 
 	if (valid) {
-		let maxId = Math.max(...Object.keys(sections).map(Number)) + 1;
+		let maxId = Section.nextId;
 
 		for (const input of inputs) {
-			sections[maxId++] = {
-				program: input.program,
-				section: input.section,
-				year: input.year,
-			};
+			Section.data[maxId++] = new Section(input);
 		}
 
 		openDialog({
@@ -182,7 +167,7 @@ function saveChanges() {
 					text: "Close",
 					type: "close",
 					variant: "outlined",
-					href: "../subject.html",
+					href: "./index.html",
 				}),
 			],
 		});

@@ -19,7 +19,10 @@
       <w-navigation></w-navigation>
       <w-content>
         <w-breakpoint>
-          <w-header> Schedule Management </w-header>
+          <div class="flex gap-auto">
+            <w-header> Schedule Management </w-header>
+            
+          </div>
           <div class="flex-col gap-md">
             <div class="flex gap-xxs" id="scheduleChips">
               <w-chip icon="material-symbols:meeting-room-outline">Room</w-chip>
@@ -97,16 +100,16 @@
           </w-dropdown>
           <div class="flex gap-xxs">
             <w-dropdown
-              icon="material-symbols:timer-outline"
               id="startInput"
               label="Start"
+              class="w-fill"
               required
             >
             </w-dropdown>
             <w-dropdown
-              icon="material-symbols:timer-outline"
               id="endInput"
               label="End"
+              class="w-fill"
               required
             >
             </w-dropdown>
