@@ -49,6 +49,7 @@ w-input-pass {
   [label] {
     display: flex;
     align-items: center;
+    border-radius: var(--xxs);
 
     position: absolute;
     top: 50%;

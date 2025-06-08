@@ -1,6 +1,6 @@
 import { createIcon } from "/@components/!util.js";
 import { Avatars, Session } from "../blueprint.js";
-import { q$ } from "../utils.js";
+import { newElement, q$ } from "../utils.js";
 
 export function update() {
 	const user = Session.currentUser;
@@ -15,6 +15,13 @@ export function update() {
 		accountIcon.addEventListener("click", () => {
 			location.href = "/account.html";
 		});
+
+		user.role === "admin" &&
+			document.head.append(
+				newElement("style", {
+					text: `[admin-hidden] { display: none; }`,
+				}),
+			);
 	} else {
 		location.href = `/index.html?redirect=${btoa(location.href)}`;
 	}

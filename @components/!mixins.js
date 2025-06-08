@@ -3,6 +3,9 @@ import { clickWithSpaceAndEnter } from "./!util.js";
 export class Setup extends HTMLElement {
 	#connected = 0;
 
+	/** @type {HTMLElement} */
+	root = this;
+
 	/** @type {Record<string, Node[]>} */
 	#slots = new Proxy(Object.create({}), {
 		get: (target, name) => {
@@ -22,6 +25,12 @@ export class Setup extends HTMLElement {
 	get slots() {
 		return this.#slots;
 	}
+
+	append = this.root.append.bind(this.root);
+	replaceChildren = this.root.replaceChildren.bind(this.root);
+	appendChild = this.root.appendChild.bind(this.root);
+	replaceChild = this.root.replaceChild.bind(this.root);
+	removeChild = this.root.removeChild.bind(this.root);
 
 	setup() {}
 
@@ -44,6 +53,8 @@ export class Setup extends HTMLElement {
 }
 
 export class Interactive extends Setup {
+	handle;
+
 	setup() {
 		super.setup();
 

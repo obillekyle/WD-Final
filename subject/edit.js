@@ -181,7 +181,7 @@ function saveChanges() {
 					text: "Close",
 					type: "close",
 					variant: "outlined",
-					onclick: "../subject.html",
+					href: "./index.html",
 				}),
 			],
 		});

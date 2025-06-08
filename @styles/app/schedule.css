@@ -1,7 +1,40 @@
+.table-container {
+  width: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 1px inset var(--outline-variant);
+
+  [table-head] {
+    gap: var(--xxs);
+    text-align: center;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+
+    display: none;
+
+    img {
+      width: var(--size-xxl);
+    }
+
+
+    margin-bottom: var(--component-lg);
+  }
+
+  #tableInfo {
+    font-size: var(--font-lg);
+    font-weight: 600;
+  }
+}
+
 .sched-table {
   border-collapse: collapse;
+  min-width: 1000px;
   width: 100%;
   table-layout: fixed;
+  position: relative;
+  
 
   td,
   th {
@@ -16,22 +49,21 @@
     }
   }
 
+  tr >:first-child {
+    width: var(--size-xl);
+    position: sticky;
+    left: 1px;
+    z-index: 1;
+    background: var(--surface);
+    box-shadow: 0 0 0 2px inset var(--surface);
+    outline: 1px solid var(--outline-variant);
+    outline-offset: 0;
+  }
+
   .highlight-today {
     background: var(--primary-light);
     color: var(--primary);
   }
-
-  /*         
-    color class bg pastel color
-    'red',
-    'orange',
-    'yellow',
-    'green',
-    'blue',
-    'indigo',
-    'violet',
-    'pink',
-  */
 
   .red {
     background: #ff9999;
@@ -116,7 +148,6 @@
 .selected {
 
   position: relative;
-  z-index: 5;
 
   &::after {
     content: '';
@@ -129,7 +160,6 @@
     background-color: color-mix(in srgb, #0000, var(--primary) 20%);
     top: 0;
     bottom: -1px;
-
   }
 
   &.start::after {
@@ -140,8 +170,10 @@
     content: 'Drag down to select';
     display: grid;
     place-items: center;
+  }
 
-
+  &.origin::after {
+    background-color: color-mix(in srgb, #0000, var(--primary) 40%);
   }
   
   &.end::after {
@@ -160,4 +192,33 @@
 
 #scheduleInput {
   max-width: 400px;
+}
+
+@media print {
+  w-content {
+    contain: none;
+    zoom: 75%;
+  }
+  
+  .table-container {
+    position: fixed;
+    padding: 1in;
+    inset: 0;
+    z-index: 1000;
+    background: var(--surface);
+    box-shadow: none;
+
+    [table-head] {
+      max-width: 100% !important;
+      display: flex;
+    }
+  
+    table {
+      min-width: 100%;
+    }
+  }
+
+  .selected::after {
+    display: none !important;
+  }
 }

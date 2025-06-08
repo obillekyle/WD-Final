@@ -5,7 +5,7 @@ import { WNavigation } from "/@components/navigation.js";
 import { Session } from "./blueprint.js";
 import { ROLES } from "./enums.js";
 import { ripple } from "./events/ripple.js";
-import { bindAttrs, newElement, q$ } from "./utils.js";
+import { bindAttrs, html, newElement, q$ } from "./utils.js";
 
 window.onpointerdown = (event) => {
 	const target = event.target;
@@ -115,4 +115,48 @@ function navigationFactory() {
 	bindAttrs(nav, { replace: [appLogo, navList, account] });
 }
 
+function footerFactory() {
+	const container = q$("w-content", null);
+	if (!container || container.querySelector("#login-form")) return;
+
+	const footer = newElement("footer");
+
+	const bp = newElement("w-breakpoint", {
+		container: true,
+		html: html`
+			<div column>
+				<img logo src="/@assets/logo.webp" alt="Logo" />
+				<span title>School Scheduling System</span>
+				<span>A Scheduling System that manages faculty members' schedule effectively and efficiently</span>
+				<span>BSIS 1A SY. 24-25</span>
+			</div>
+			<div column>
+				<w-link 
+					href="tel:0448026716"
+					icon="material-symbols:call-outline"
+				>
+					<span>(044) 802 6716</span>
+				</w-link>			
+				<w-link href="tel:0448026716" icon=" ">
+					<span>(044) 802 6716</span>
+				</w-link>
+				<w-link href="mailto:communications@bpc.edu.ph" icon="mdi:at">
+					<span>communications@bpc.edu.ph</span>
+				</w-link>
+				<w-link 
+					target="_blank" 
+					icon="material-symbols:location-on-outline"
+					href="https://maps.app.goo.gl/EcMmAgYDD355aLMq5" 
+				>
+					<span>110a MacArthur Hwy, Malolos, Bulacan 3000</span>
+				</w-link>
+			</div>
+		`,
+	});
+
+	footer.replaceChildren(bp);
+	container.append(footer);
+}
+
+footerFactory();
 navigationFactory();

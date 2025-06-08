@@ -533,18 +533,42 @@ export async function openFilePicker(type, multiple = false) {
 
 const timeouts = new Map();
 /**
- * @param {() => void} callback
+ * @param {() => any} callback
  * @param {number | undefined} delay
+ * @param {string} [key]
  */
-export function debounce(callback, delay) {
-	timeouts.has(callback) ? clearTimeout(timeouts.get(callback)) : callback();
+export function debounce(callback, delay, key) {
+	key ??= String(key ?? Date.now() + Math.random());
+
+	timeouts.has(key) ? clearTimeout(timeouts.get(key)) : callback();
 	timeouts.set(
-		callback,
+		key,
 		setTimeout(() => {
 			callback();
-			timeouts.delete(callback);
+			timeouts.delete(key);
 		}, delay),
 	);
+
+	return key;
+}
+
+const throttles = new Map();
+
+/**
+ * @param {() => any} callback
+ * @param {number} [delay]
+ * @param {string} [key]
+ */
+export function throttle(callback, delay = 20, key) {
+	key ??= String(key ?? Date.now() + Math.random());
+
+	const now = Date.now();
+	const last = throttles.get(key) || 0;
+
+	if (now - last < delay) return;
+
+	callback();
+	throttles.set(key, now);
 }
 
 /** @type {(value: any, message?: string) => asserts value} */
@@ -615,4 +639,8 @@ export function svgToBase64(svg) {
 	});
 
 	return btoa(binary);
+}
+
+export function toCapitalized(str) {
+	return str[0].toUpperCase() + str.slice(1);
 }

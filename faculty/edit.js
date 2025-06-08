@@ -24,7 +24,7 @@ if (!faculty) {
 			newElement("w-button", {
 				text: "Close",
 				type: "close",
-				href: "../faculty.html",
+				href: "./index.html",
 			}),
 		],
 	});
@@ -32,7 +32,7 @@ if (!faculty) {
 
 if (form) {
 	Object.entries(faculty).forEach(([key, value]) => {
-		form[key].value = value;
+		if (form[key]) form[key].value = value;
 	});
 }
 
@@ -77,7 +77,7 @@ function editFaculty() {
 				newElement("w-button", {
 					text: "Close",
 					type: "close",
-					href: "../faculty.html",
+					href: "./index.html",
 				}),
 			],
 		});

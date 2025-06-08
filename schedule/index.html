@@ -38,20 +38,32 @@
             <w-box id="scheduleInput"></w-box>
           </div>
 
-          <table class="sched-table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Mon</th>
-                <th>Tue</th>
-                <th>Wed</th>
-                <th>Thu</th>
-                <th>Fri</th>
-                <th>Sat</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <div class="table-container">
+            <div table-head>
+              <img src="/@assets/logo.webp" alt="Logo" />
+              <div id="tableInfo"></div>
+              <img src="/@assets/ched.webp" alt="Logo" />
+            </div>
+
+            <table class="sched-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th>Sat</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          
+          <w-button icon="material-symbols:print-outline" onclick="print()">
+            Print
+          </w-button>
         </w-breakpoint>
       </w-content>
     </w-app>

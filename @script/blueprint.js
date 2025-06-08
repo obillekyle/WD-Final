@@ -33,6 +33,7 @@ import {
 
 function binder(thisArg, options) {
 	Object.keys(options).forEach((key) => {
+		if (key.startsWith("_")) return;
 		thisArg[key] = options[key] ?? thisArg[key];
 	});
 }
@@ -148,7 +149,6 @@ export class UserInfo extends WithID {
 export class Avatars {
 	static get(id) {
 		const user = Account.get(id);
-		console.log(user);
 
 		return profiles[id] || Avatars.svgAvatar(user?.fname[0] || "?");
 	}
@@ -231,7 +231,7 @@ export class Account extends UserInfo {
 	}
 
 	static get nextId() {
-		return Math.max(...Object.keys(accounts).map(Number));
+		return Math.max(...Object.keys(accounts).map(Number)) + 1;
 	}
 
 	/**
@@ -283,7 +283,7 @@ export class Faculty extends UserInfo {
 	}
 
 	static get nextId() {
-		return Math.max(...Object.keys(faculties).map(Number));
+		return Math.max(...Object.keys(faculties).map(Number)) + 1;
 	}
 
 	/** @param {string | number} id */
@@ -429,7 +429,7 @@ export class Section extends WithID {
 	}
 
 	static get nextId() {
-		return Math.max(...Object.keys(sections).map(Number));
+		return Math.max(...Object.keys(sections).map(Number)) + 1;
 	}
 
 	static get data() {
@@ -514,7 +514,7 @@ export class Schedule extends WithID {
 	}
 
 	static get nextId() {
-		return Math.max(...Object.keys(schedules).map(Number));
+		return Math.max(...Object.keys(schedules).map(Number)) + 1;
 	}
 
 	/** @param {string | number} id */
@@ -524,12 +524,12 @@ export class Schedule extends WithID {
 
 	/** @param {string | number} id */
 	static onRoom(id) {
-		return Room.get(id)?._schedules;
+		return Room.get(id)?._schedules || [];
 	}
 
 	/** @param {string | number} id */
 	static onSection(id) {
-		return Section.get(id)?._schedules;
+		return Section.get(id)?._schedules || [];
 	}
 
 	/** @readonly */
@@ -559,7 +559,6 @@ export class Schedule extends WithID {
 		const conflicts = [];
 
 		for (const existingSchedule of Object.values(Schedule.data)) {
-			console.log(schedule._id, existingSchedule._id);
 			if (schedule._id && schedule._id === existingSchedule._id) {
 				continue;
 			}
@@ -578,14 +577,15 @@ export class Schedule extends WithID {
 						reasons.push("Instructor conflict");
 					}
 
-					conflicts.push(
-						new Conflict({
-							type: "time",
-							of: schedule,
-							with: existingSchedule,
-							reasons,
-						}),
-					);
+					reasons.length &&
+						conflicts.push(
+							new Conflict({
+								type: "time",
+								of: schedule,
+								with: existingSchedule,
+								reasons,
+							}),
+						);
 				}
 			}
 		}

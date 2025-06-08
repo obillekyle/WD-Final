@@ -1,10 +1,9 @@
 import { WTable } from "/@components/table.js";
-import { accounts, faculties, getUserFullname } from "/@script/data.js";
-import { NAME, ROLES } from "/@script/enums.js";
+import { ROLES } from "/@script/enums.js";
 import { assert, debounce, expose, newElement, q$ } from "/@script/utils.js";
 
 import "/@script/page/account-setup.js";
-import { getUser } from "/@script/login.js";
+import { Account, Session } from "/@script/blueprint.js";
 
 const table = q$("w-table", null, WTable);
 assert(table, "Table not found");
@@ -17,11 +16,22 @@ table.columns = {
 };
 
 function getTableData() {
-	return Object.entries(accounts).map(([id, data]) => ({
+	return Object.entries(Account.data).map(([id, data]) => ({
 		id,
-		name: getUserFullname(id, NAME.WITH_INITIAL),
-		email: data.email,
+		name: {
+			class: "flex align-center gap-xs",
+			append: [
+				newElement("img", {
+					class: "avatar",
+					width: "40",
+					style: "border-radius: 50%;",
+					src: data._avatar,
+				}),
+				newElement("span", { text: data.formatName() }),
+			],
+		},
 		role: getRoleName(data.role),
+		email: data.email,
 	}));
 }
 
@@ -36,13 +46,12 @@ function getRoleName(role) {
 	}
 }
 
-const user = getUser();
-
+const user = Session.currentUser;
 assert(user, "User must be logged in");
 
 table.data = getTableData();
 table.sort("name", "asc");
-table.disabled = [user.id];
+table.disabled = [user._id];
 
 function search(value) {
 	table?.search(value, "name");
@@ -77,7 +86,8 @@ deleteIcon?.addEventListener("click", () => {
 							class: "error",
 							onclick: (event) => {
 								for (const id of table.selected) {
-									delete faculties[id];
+									if (id === user._id) continue;
+									delete Account.data[id];
 								}
 								table.data = getTableData();
 								table.refresh();

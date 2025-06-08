@@ -90,8 +90,10 @@
     position: absolute;
     width: 100%;
     top: 0;
+    background-image: url('/@assets/profile-bg.svg');
     background-color: var(--surface-variant);
     background-position: center;
+    opacity: 0.5;
     background-size: cover;
     z-index: -1;
   }
@@ -111,6 +113,36 @@
     border-radius: var(--rounded);
     background-size: cover;
     overflow: hidden;
+  }
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-container);
+  gap: var(--sm);
+  margin-top: auto;
+  
+  [container] {  
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  }
+  
+  [column] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sm);
+    justify-content: end;
+  }
+
+  [logo] {
+    width: var(--component-xl);
+    aspect-ratio: 1;
+  }
+
+  [title] {
+    font-size: var(--font-xl);
+    font-weight: 700;
   }
 }
 

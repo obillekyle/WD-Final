@@ -1,13 +1,16 @@
 import { WDropdown } from "/@components/select.js";
-import { days, timeRows } from "/@script/constants.js";
-import { NAME, WEEKDAYS } from "/@script/enums.js";
+import { timeRows } from "/@script/constants.js";
+import { NAME, ROLES, WEEKDAYS } from "/@script/enums.js";
 import {
+	as,
 	assert,
 	bindAttrs,
 	newElement,
 	q$,
 	qAll$,
 	replaceElement,
+	throttle,
+	toCapitalized,
 } from "/@script/utils.js";
 import "/@script/page/account-setup.js";
 import { openDialog } from "/@components/dialog.js";
@@ -16,6 +19,7 @@ import {
 	Room,
 	Schedule,
 	Section,
+	Session,
 	Subject,
 } from "/@script/blueprint.js";
 
@@ -25,6 +29,23 @@ const TYPE = Object.freeze({
 	SECTION: "section",
 });
 
+const user = Session.currentUser;
+
+if (!user) {
+	openDialog({
+		title: "Internal Error",
+		content: "You must be logged in to view this page.",
+		actions: [
+			newElement("w-button", {
+				text: "OK",
+				onclick: () => location.reload(),
+			}),
+		],
+	});
+
+	assert(user);
+}
+
 // get search params
 const params = new URLSearchParams(window.location.search);
 let type = params.get("type") || TYPE.ROOM;
@@ -32,6 +53,13 @@ let id = params.get("id") || "";
 
 // define static data
 const colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+let column = 0;
+let cellStart = -1;
+let cellEnd = -1;
+let initialStart = -1;
+
+let dragging = false;
+let startClick = 0;
 
 // load dropdowns
 const facultyInput = q$("#facultyInput", null, WDropdown);
@@ -244,6 +272,10 @@ function resetTable() {
 function updateTable() {
 	resetTable();
 
+	initialStart = -1;
+	cellStart = -1;
+	cellEnd = -1;
+
 	switch (type) {
 		case TYPE.ROOM:
 			updateRoomTable(id);
@@ -262,10 +294,16 @@ function updateTable() {
 function updateRoomTable(id) {
 	resetTable();
 
-	const table = q$(".sched-table tbody");
+	q$("#tableInfo")?.replaceChildren(
+		newElement("div", { text: "Bulacan Polytechnic College" }),
+		newElement("div", { text: `Room Schedule - ${Room.get(id).name}` }),
+		newElement("div", { text: "School Year 2024-2025" }),
+	);
+
+	const table = q$(".sched-table tbody", null, HTMLTableElement);
 	const roomData = Schedule.onRoom(id);
 
-	if (!table || !roomData) return;
+	if (!table) return;
 
 	for (const [key, entry] of Object.entries(roomData)) {
 		const colIndex = entry.day;
@@ -279,9 +317,7 @@ function updateRoomTable(id) {
 				bindAttrs(cell, {
 					append: [
 						newElement("div", { text: entry.subject.toUpperCase() }),
-						newElement("div", {
-							text: Faculty.get(entry.faculty).formatName(),
-						}),
+						newElement("div", { text: Faculty.getName(entry.faculty) }),
 						newElement("div", { text: Section.get(entry.section)._name }),
 					],
 				});
@@ -300,7 +336,13 @@ function updateRoomTable(id) {
 function updateFacultyTable(id) {
 	resetTable();
 
-	const table = q$(".sched-table tbody");
+	q$("#tableInfo")?.replaceChildren(
+		newElement("div", { text: "Bulacan Polytechnic College" }),
+		newElement("div", { text: `Faculty Schedule - ${Faculty.getName(id)}` }),
+		newElement("div", { text: "School Year 2024-2025" }),
+	);
+
+	const table = q$(".sched-table tbody", null, HTMLTableElement);
 	const facultyData = Schedule.for(id);
 
 	if (!table) return;
@@ -322,8 +364,6 @@ function updateFacultyTable(id) {
 					],
 				});
 
-				console.log(entry);
-
 				cell.setAttribute("schedule", entry._id);
 				cell.setAttribute("rowspan", String(entry.end - entry.start));
 				cell.classList.add(colors[Number(key) % colors.length]);
@@ -338,7 +378,13 @@ function updateFacultyTable(id) {
 function updateSectionTable(id) {
 	resetTable();
 
-	const table = q$(".sched-table tbody");
+	q$("#tableInfo")?.replaceChildren(
+		newElement("div", { text: "Bulacan Polytechnic College" }),
+		newElement("div", { text: `Section Schedule - ${Section.get(id)._name}` }),
+		newElement("div", { text: "School Year 2024-2025" }),
+	);
+
+	const table = q$(".sched-table tbody", null, HTMLTableElement);
 	const sectionData = Schedule.onSection(id);
 
 	if (!table) return;
@@ -356,9 +402,7 @@ function updateSectionTable(id) {
 					append: [
 						newElement("div", { text: entry.subject.toUpperCase() }),
 						newElement("div", { text: Room.get(entry.room).name }),
-						newElement("div", {
-							text: Faculty.get(entry.faculty).formatName(),
-						}),
+						newElement("div", { text: Faculty.getName(entry.faculty) }),
 					],
 				});
 
@@ -373,26 +417,11 @@ function updateSectionTable(id) {
 	}
 }
 
-let column = 0;
-let cellStart = -1;
-let cellEnd = -1;
-
-let dragging = false;
-let startClick = 0;
-
-function getFocusValue() {
-	switch (type) {
-		case "room":
-			return { room: id };
-		case "faculty":
-			return { instructor: id };
-		case "section":
-			return { section: id };
-	}
-}
-
 document.addEventListener("pointerdown", (event) => {
-	const target = /** @type {HTMLElement} */ (event.target);
+	const target = as(event.target, HTMLElement);
+
+	if (!id) return false;
+	if (user.role === ROLES.ADMIN) return false;
 
 	if (startClick + 200 > Date.now()) {
 		if (target.hasAttribute("schedule") || target.matches(".selected")) {
@@ -403,25 +432,26 @@ document.addEventListener("pointerdown", (event) => {
 							day: column,
 							start: cellStart,
 							end: cellEnd + 1,
-							...getFocusValue(),
+							[type]: id,
 						}),
 					),
 			);
 			return;
 		}
-
-		dragging = true;
 	} else {
 		startClick = Date.now();
-		return false;
 	}
 
-	if (target.tagName !== "TD" || target.matches(".time")) {
-	}
+	if (target.matches(".selected, .sidebar, .sidebar *")) return;
 
-	column = Number(target.getAttribute("data-column"));
-	cellStart = Number(target.getAttribute("data-row"));
-	cellEnd = cellStart;
+	dragging = true;
+	document.body.style.cursor = "ns-resize";
+
+	const size = Number(target.getAttribute("rowspan") || 1);
+	column = Number(target.dataset.column || -1);
+	cellStart = Number(target.dataset.row || -1);
+	cellEnd = cellStart + size - 1;
+	initialStart = cellStart;
 
 	highlightCells();
 });
@@ -429,22 +459,24 @@ document.addEventListener("pointerdown", (event) => {
 document.addEventListener("pointermove", (event) => {
 	if (!dragging) return;
 
-	const target = /** @type {HTMLElement} */ (event.target);
+	const target = as(event.target, HTMLElement);
 
 	if (target.tagName !== "TD" || target.matches(".time")) return;
+	if (!target.matches("[data-row]")) return;
+	const size = Number(target.getAttribute("rowspan") || 1);
+	const pos = Number(target.dataset.row || -1);
 
-	const newColumn = Number(target.getAttribute("data-column"));
-	const newRow = Number(target.getAttribute("data-row"));
+	if (pos < initialStart - 5 || pos + size > initialStart + 6) return;
 
-	if (cellStart > newRow) {
-		return;
-	} else if (newColumn !== column) {
-		column = newColumn;
-		cellStart = newRow;
-		cellEnd = cellStart;
-	} else if (cellStart + 6 > newRow) {
-		cellEnd = newRow;
-	}
+	console.log(size);
+
+	const newPos = Number(target.dataset.row || -1);
+	const newEnd = newPos + size - 1;
+
+	cellStart = Math.max(Math.min(newPos, initialStart), initialStart - 5, 0);
+	cellEnd = Math.min(Math.max(newEnd, initialStart), initialStart + 5);
+
+	console.log(cellStart, cellEnd);
 
 	highlightCells();
 });
@@ -452,26 +484,34 @@ document.addEventListener("pointermove", (event) => {
 document.addEventListener("pointerup", () => {
 	dragging = false;
 	highlightCells();
+	document.body.style.cursor = "default";
 });
 
 function highlightCells() {
-	const old = qAll$(".sched-table td.selected");
+	const oldCells = qAll$(".sched-table td.selected");
 
-	for (const cell of old) {
-		cell.classList.remove("selected", "start", "end");
+	for (const cell of oldCells) {
+		cell.classList.remove("selected", "start", "end", "origin");
 	}
+
+	if (cellStart < 0 || cellEnd < 0 || initialStart < 0) return;
 
 	for (let i = cellStart; i <= cellEnd; i++) {
 		const cell = q$(`td[data-column="${column}"][data-row="${i}"]`);
 
 		if (!cell) continue;
+
+		const size = Number(cell.getAttribute("rowspan") || 1);
+		console.log(cellEnd, i + (size - 1));
+
 		cell.classList.toggle("start", i === cellStart);
-		cell.classList.toggle("end", i === cellEnd);
+		cell.classList.toggle("origin", i === initialStart);
+		cell.classList.toggle("end", i + (size - 1) === cellEnd);
 		cell.classList.add("selected");
 	}
 }
 
-/** @param { Schedule} schedule */
+/** @param {Schedule} schedule */
 function editData(schedule) {
 	assert(
 		facultyInput &&
@@ -483,8 +523,6 @@ function editData(schedule) {
 			dayInput,
 		"Missing inputs",
 	);
-
-	console.log(schedule);
 
 	const sidebar = q$(".sidebar", null, HTMLFormElement);
 
@@ -523,7 +561,7 @@ function editData(schedule) {
 						text: "Yes",
 						type: "close",
 						class: "error",
-						onclick: () => deleteSchedule(id),
+						onclick: () => deleteSchedule(schedule._id),
 					}),
 				],
 			});
@@ -567,8 +605,8 @@ function editSchedule(data) {
 
 	const newData = new Schedule(
 		/** @type {any} */ ({
-			id: data._id || Schedule.nextId,
 			...data,
+			id: data._id || Schedule.nextId,
 			faculty: Number(facultyInput.value),
 			room: roomInput.value,
 			subject: subjectInput.value,
@@ -578,8 +616,6 @@ function editSchedule(data) {
 			end,
 		}),
 	);
-
-	console.log(newData);
 
 	const conflicts = Schedule.hasConflicts(newData);
 
@@ -662,6 +698,5 @@ function deleteSchedule(id) {
 // @ts-ignore
 window.closeSidebar = (event) => {
 	if (event.currentTarget !== event.target) return;
-
 	q$(".sidebar")?.classList.remove("open");
 };
